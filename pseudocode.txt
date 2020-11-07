@@ -1,0 +1,52 @@
+Alg --> feed forward --> return error --> iterate to reduce error
+
+TODO: implement a method in NeuralNetwork.py that takes in set of weights for entire 
+network, then uses those weights to feed forward whole dataset (BATCH?) and calculate error and return error.
+
+network feed forward error = "fitness function"
+
+GeneticAlgorithm.py
+
+Class GA:
+    Population (contains all individuals)
+    time = 0
+    
+    def mutate(individual) -> individual
+
+    def crossover(individual1, individual2) -> p1, p2
+
+    def select(population) -> new population?
+
+
+DifferentialEvolution.py
+    Population
+    time = 0
+
+    def mutate(individual) -> individual
+
+    def crossover(individual1, individual2) -> p1, p2
+
+    def select(population) -> new population?
+
+
+ParticleSwarmOptimization.py
+
+
+individual.py
+
+Class individual: 
+    id
+    position(set of weights) = numpy array? 
+    fitness
+    personal best
+    neighbor 1
+    neighbor 2
+
+Class Population:
+    population = [individual]
+    global best
+
+
+
+
+
