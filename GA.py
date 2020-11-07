@@ -1,4 +1,10 @@
 
+class individual:
+    
+    def __init__(self):
+        self.fitness = 10
+        self.chromosome = [] # some numpy == weights
+
 
 class GA:
     #hyperparameter?
