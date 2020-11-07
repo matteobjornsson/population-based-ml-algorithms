@@ -54,10 +54,15 @@ class GA:
         #TODO: pick mutation mechanism.
         pass
 
-
-# Until convergence: 
-    # select individuals from pop to mate
-    # crossover
-    # mutate
-    # evaluate fitness of new individuals
-    # replace existing population
+##################################
+# Main function down here? 
+# Remember, functions we can dispatch as jobs with unique parameters = parallelizeable. 
+#################################
+    def driver(input_parameters): 
+        # Until convergence: 
+            # select individuals from pop to mate
+            # crossover
+            # mutate
+            # evaluate fitness of new individuals
+            # replace existing population
+        pass
