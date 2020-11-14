@@ -2,16 +2,32 @@
 import numpy as np
 
 class Particle:
+    '''
+    This class represents a particle in the swarm. Each particle maintains a 
+    current position and velocity as well as a running record of its personal best
+    position and fitness. 
+    '''
 
-    def __init__(self, position_range: float, velocity_range: float, input_size: int, layers: list, output_size = 1):
-
-        total_layers = [input_size] + layers + [output_size]
-        total_particles = 0
-        for i in range(len(total_layers)-1):
-            total_particles += total_layers[i] * total_layers[i+1]
-        self.position = np.random.uniform(-position_range, position_range, total_particles)
-        self.velocity = np.random.uniform(-velocity_range, velocity_range, total_particles)
+    def __init__(self, position_range: float, velocity_range: float, layers: list):
+        '''
+        :param position_range: float. indicates the bounds for the random uniform
+        distribution used to generate initial positions.
+        :param velocity_range: float. same as above but for velocity.
+        :param layers: list. Expected format: [input nodes, h1_nodes, h2_nodes, output_nodes]
+        h1 and h2 can be missing but there must be an input and output: [input, output]
+        '''
+        # the total weights are represented by the number of weights needed to be 
+        # estimated for the NN, which is the sum of each layer multiplied by the next layer
+        total_weights = 0
+        for i in range(len(layers)-1):
+            total_weights += layers[i] * layers[i+1]
+        # initialize each weight from a random uniform distribution
+        self.position = np.random.uniform(-position_range, position_range, total_weights)
+        # same for velocity
+        self.velocity = np.random.uniform(-velocity_range, velocity_range, total_weights)
+        # we are minimizing our fitness, so it is initialized as pos infinity
         self.fitness = float('inf')
+        # current bests are initial bests
         self.pbest_position = self.position
         self.pbest_fitness = self.fitness
 
