@@ -1,8 +1,9 @@
-
+import random
 from NeuralNetwork import NeuralNetwork
 import DataUtility
 import numpy as np
 import copy
+import matplotlib.pyplot as plt
 
 class Particle:
     '''
@@ -71,6 +72,8 @@ class PSO:
         self.c1 = .3
         self.c2 = .3
         self.vmax = 10
+        # fitness plotting:
+        self.fitness_plot = []
 
     def swarm_diversity(self) -> float:
         pass
@@ -82,7 +85,24 @@ class PSO:
     def update_position_and_velocity(self):
         # iterate over each particle
             # update v and x using equations from class
-        pass
+            # x_(t+1) = x_t + v_(t+1)
+            # v_(t+1) = w*v_t + c1*r1*(pb_t - x_t) + c2*r2*(gb_t - x_t)
+        for p in self.population:
+
+            v = p.velocity
+            w = self.omega
+            c1 = self.c1
+            r1 = random.uniform(0,1)
+            c2 = self.c2
+            r2 = random.uniform(0,1)
+            pb = p.pbest_position
+            gb = self.gbest_position
+            x = p.position
+
+            new_v = w*v + c1*r1*(pb - x) + c2*r2*(gb - x)
+
+            p.velocity = new_v
+            p.position += new_v
 
     ########################################
     # Evaluate the fitness of an individual
@@ -108,6 +128,8 @@ class PSO:
             if self.gbest_fitness > fitness:
                 self.gbest_fitness = fitness
                 self.gbest_position = p.position
+
+        self.fitness_plot.append(self.gbest_fitness)
 
 
     ####################################
@@ -296,7 +318,13 @@ if __name__ == '__main__':
                 nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
                 nn.set_input_data(X,labels)
                 pso = PSO(layers, 10, nn)
+                plt.ion
+                for j in range(100):
+                    pso.update_fitness()
+                    pso.update_position_and_velocity()
+                    plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                    plt.draw()
+                    plt.pause(0.00001)
+                    plt.clf()
 
-                pso.update_fitness()
-                x = 1
 
