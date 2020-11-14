@@ -1,13 +1,19 @@
 
+import numpy as np
 
-class particle:
+class Particle:
 
-    def __init__(self):
-        #initialize random weights and velocities
-        self.position = [] # numpy array, == weights
-        self.velocity = [] 
-        self.fitness = 5
-        self.personal_best = 3
+    def __init__(self, position_range: float, velocity_range: float, input_size: int, layers: list, output_size = 1):
+
+        total_layers = [input_size] + layers + [output_size]
+        total_particles = 0
+        for i in range(len(total_layers)-1):
+            total_particles += total_layers[i] * total_layers[i+1]
+        self.position = np.random.uniform(-position_range, position_range, total_particles)
+        self.velocity = np.random.uniform(-velocity_range, velocity_range, total_particles)
+        self.fitness = float('inf')
+        self.pbest_position = self.position
+        self.pbest_fitness = self.fitness
 
 
 class PSO:
@@ -60,3 +66,6 @@ class PSO:
     # initialize
     # until convergence of global best:
         # update V and X for each swarm memeber and eval fitness
+
+if __name__ == '__main__':
+    p = Particle(10, 1, 7, [7,2], 1)
