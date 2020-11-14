@@ -27,17 +27,22 @@ class Particle:
         self.velocity = np.random.uniform(-velocity_range, velocity_range, total_weights)
         # we are minimizing our fitness, so it is initialized as pos infinity
         self.fitness = float('inf')
-        # current bests are initial bests
-        self.pbest_position = self.position
+        # current best is initial best
         self.pbest_fitness = self.fitness
+        self.pbest_position = None
 
 
 class PSO:
+    '''
+    this is the driver class for the PSO. For the given number of iterations or stopping condition
+    it will update particle positions and velocities and track the global best position
+    which is the position with the best fitness so far. 
+    '''
 
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list):
+    def __init__(self, layers: list, pop_size: int):
         #init general population 
             # random weight values, weight matrix is numpy array, matches network architecture
             # use similar weight init function as from NN
@@ -45,9 +50,15 @@ class PSO:
         # INIT BOTH *POSITION* (WEIGHTS) AND *VELOCITY*
 
         #TODO: figure out if we should init a NN here or pass in, etc. What layer does this file represent
-        self.pop_size = 10
-        self.population= [] 
-        self.global_best = 10
+        self.position_range = 10
+        self.velocity_range = 1
+        self.pop_size = pop_size
+        self.population = [] 
+        for i in range(pop_size):
+            self.population.append(Particle(self.position_range, self.velocity_range, layers))
+
+        self.gbest_fitness = float('inf')
+        self.gbest_position = None
         self.t = 0
         self.max_t = 1000
         #HYPERPARAMETERS:

@@ -9,7 +9,6 @@
 from types import new_class
 import numpy as np
 import math
-import TestData
 import DataUtility
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -187,7 +186,7 @@ class NeuralNetwork:
         return A
 
     #Function will claculate the forward pass and will update acivation function outputs 
-    def forward_pass(self) -> None:
+    def forward_pass(self) -> float:
         """ Starting from the input layer propogate the inputs through to the output
         layer. Return a matrix of outputs.
         Return: None
@@ -229,6 +228,7 @@ class NeuralNetwork:
         if self.pass_count > 1:
             self.error_y.append(error)
             self.error_x.append(self.pass_count)
+        return error
         
     ####################################################################
     ############### BACKPROPAGATION  ###################################
@@ -363,6 +363,7 @@ class NeuralNetwork:
         #Return the labels from the activation outputs 
         return self.activation_outputs[-1]
     
+    ########################## pick class value ##################################
     #Given an array of probabilities pick the index with the highest set 
     def PickLargest(self, Probabilities):
         # print("Pick largest input:", type(Probabilities), Probabilities.shape, '\n', Probabilities)
@@ -385,6 +386,11 @@ class NeuralNetwork:
             Estimation.append(Index)
         #Return the array 
         return Estimation
+
+    ####################### FITNESS ############################################
+    def fitness(self, weights: list) -> float:
+        self.weights = weights
+        return self.forward_pass()
  
 
 
