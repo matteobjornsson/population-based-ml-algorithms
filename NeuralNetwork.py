@@ -18,7 +18,7 @@ class NeuralNetwork:
 
     #On creation of a Neural Network object do the following 
     def __init__(self, input_size: int, hidden_layers: list, regression: bool, 
-                    output_size: int, learning_rate: float, momentum: float ) -> None:
+                    output_size: int) -> None:
         """
         :param input_size: int. dimension of the data set (number of features in x).
         :param hidden_layers: list. [n1, n2, n3..]. List of number of nodes in 
@@ -34,8 +34,7 @@ class NeuralNetwork:
         self.output_size = output_size
         self.layer_node_count = [input_size] + hidden_layers + [output_size]
         self.layers = len(self.layer_node_count)
-        # learning rate
-        self.learning_rate = learning_rate
+
         # weights, biases, and layer outputs are lists with a length corresponding to
         # the number of hidden layers + 1. Therefore weights for layer 0 are found in 
         # weights[0], weights for the output layer are weights[-1], etc. 
@@ -47,10 +46,7 @@ class NeuralNetwork:
         self.activation_outputs = [None] * self.layers
         self.layer_derivatives = [None] * self.layers
         self.data_labels = None
-        # store old versions of the gradients for momentum
-        self.old_bias_derivatives = [None] * self.layers
-        self.old_weight_derivatives = [None] * self.layers
-        self.momentum = momentum
+
         #following is used to plot error 
         self.error_y = []
         self.error_x = []
@@ -229,124 +225,6 @@ class NeuralNetwork:
             self.error_y.append(error)
             self.error_x.append(self.pass_count)
         return error
-        
-    ####################################################################
-    ############### BACKPROPAGATION  ###################################
-    ####################################################################
-
-    #Function will calculate the inner layer derivative 
-    def calculate_inner_layer_derivative(self, j: int) -> None:
-        """ Calculates the partial derivative of the error with respect to the current
-        layer: delta_j = a_j * (1 - a_j) * W^T_j+1 dot delta_j+1
-        where j = layer, a_j = activation output matrix of layer j, W_j+1 = weights
-        matrix of layer j+1 and delta_j+1 is the derivative matrix of layer j+1.
-        Here * means elementwise multiplication, 'dot' means dot product. 
-
-        note: a(1-a) is from the derivative of the sigmoid activation function. 
-        This would need to be changed if using a different function. 
-
-        :param j: inner layer for which we are calculating the derivative
-        """
-        # check that this is not the output layer (derivative is different there)
-        assert j != self.layers-1
-        # activation outputs of this layer
-        a = self.activation_outputs[j]
-        # weights of the next layer
-        W = self.weights[j+1]
-        # partial derivative of the next layer
-        delta_jPlusOne = self.layer_derivatives[j+1]
-        # calculate the derivative of this layer and return it
-        d_layer = (self.d_sigmoid(a) * np.dot(W.T, delta_jPlusOne))
-        return d_layer
-
-    #This functuion will calcualte the output layer deritvate 
-    def calculate_output_layer_derivative(self) -> None:
-        """ Return delta_output = (a - Y) * a * (1 - a) 
-        ***** this assumes squared error fn and sigmoid activation ************
-        Here a = activation output matrix of output layer, Y = ground truth for input
-        examples X. 
-        * means elementwise multiplication, 'dot' means dot product. 
-        """
-        # activation outputs of the output layer
-        a = self.activation_outputs[-1]
-        # ground truth for comparing the estimates to
-        Y = self.data_labels
-        
-        # calculate the derivative dError/dactivation * dactivation/dnet
-        # here (a - Y) is the error fn derivative, a * (1-a) is the sigmoid derivative
-        #TODO: May be the cause if numbers are skewedd 
-        if self.regression == False: 
-            d_layer = (a - Y)
-        else: 
-            d_layer = (a - Y) * a * (1 - a)
-        return d_layer
-
-    #This function will use packprogation for a neural network to update the weights 
-    def backpropagation_pass(self):
-        """ Starting from the input layer propogate the inputs through to the output
-        layer.
-        """
-        # iterate through each layer, starting from the output layer and calculate
-        # the partial derivative of each layer
-        for i in reversed(range(1, self.layers)):
-            # the last layer is differentiated differently, so it is picked out.
-            if i == self.layers - 1:
-                self.layer_derivatives[i] = self.calculate_output_layer_derivative()
-            else:
-                self.layer_derivatives[i] = self.calculate_inner_layer_derivative(i)
-            # the goal of backpropagation is to update the weights of each layer.
-            # This can be done after calculating the derivative for each layer.
-            self.update_weights(i)
-            self.update_bias(i)
-    #This function will update all of the bias values in the nerual network 
-    def update_bias(self, i: int) -> None:
-        """ update the bias. The formula: B^i_new = B^i_old - delta_i * learning_rate
-        the partial derivative of the bias is the same as the partial derivtive of
-        of the layer.
-        :param i: layer for which we are updating the bias
-        Return: None
-        """
-        #grab this layer's derivative
-        # print(self.layer_derivatives[i].shape)
-        m = self.layer_derivatives[i].shape[1]
-        delta_i = (1/m) * np.sum(self.layer_derivatives[i], axis=1, keepdims=True)
-        # delta_i = self.layer_derivatives[i]
-        #update the bias
-        # if the first pass has already happened, apply momentum term
-        if self.pass_count > 1:
-            delta_i_old = self.old_bias_derivatives[i]
-            self.biases[i] -= self.learning_rate * (delta_i + self.momentum * delta_i_old)
-        # otherwise update bias
-        else:
-            self.biases[i] -= delta_i * self.learning_rate
-
-        self.old_bias_derivatives[i] = delta_i
-    #Function that will update all of the weights in the neural network generated b the formula listed in the comment below 
-    def update_weights(self, i: int) -> None:
-        """ update the weights. The formula:  W^i_new = W^i_old - dW^i * learning_rate
-        where dW^i = delta_i dot a^(i-1).T 
-        the partial derivative of the weights is the partial derivtive of the layer
-        times the activation values of the previous layer.
-        :param i: layer for which we are updating the bias
-        Return: None
-        """
-        # get the partial derivative of this layer
-        delta_i = self.layer_derivatives[i]
-        # get the previous layer activation values
-        a_iMinusOne = self.activation_outputs[i-1].T
-        # calculate the change in weights per learning rate
-        dWeights = np.dot(delta_i, a_iMinusOne)
-        # if this is after the first pass, apply the momentum term
-        if self.pass_count > 1:
-            dWeights_old = self.old_weight_derivatives[i]
-            # adjust the weights as the old values minus the derivative times the learning rate
-            self.weights[i] -= self.learning_rate * (dWeights + self.momentum * dWeights_old)
-        # otherwise just calculate the weights update without mementum
-        else:
-            # adjust the weights as the old values minus the derivative times the learning rate
-            self.weights[i] -= self.learning_rate * dWeights
-
-        self.old_weight_derivatives[i] = dWeights
 
     ##################### CLASSIFICATION #######################################
     #Given a numpy array of data and labels return a classification guess for the data set 
@@ -418,16 +296,3 @@ if __name__ == '__main__':
     )
     NN.set_input_data(X, labels)
     # print(vars(NN))
-    plt.ion()
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
-    for i in range(50000):
-        NN.forward_pass()
-        NN.backpropagation_pass()
-        if i % 1000 == 0:
-            plt.plot(NN.error_x, NN.error_y)
-            plt.draw()
-            plt.pause(0.00001)
-            plt.clf()
-    plt.ioff()
-    plt.plot(NN.error_x, NN.error_y)
-    plt.show()
