@@ -1,4 +1,5 @@
 import random
+import Performance
 from NeuralNetwork import NeuralNetwork
 import DataUtility
 import numpy as np
@@ -153,6 +154,13 @@ class PSO:
         # update V and X for each swarm memeber and eval fitness
 
 if __name__ == '__main__':
+
+    headers = ["Data set", "Hidden Layers", "h1 nodes", "h2 nodes", "learning rate", "momentum", "batch size", "batches", "epochs", "loss1", "loss2"]
+    filename = 'PSO_test.csv'
+
+    Per = Performance.Results()
+    Per.PipeToFile([], headers, filename)
+
     data_sets = ["soybean", "glass", "abalone","Cancer","forestfires", "machine"] 
 
     regression_data_set = {
@@ -346,5 +354,55 @@ if __name__ == '__main__':
                     plt.pause(0.00001)
                     plt.clf()
                 ################################# new code for PSO end ###################################
+                
+                Estimation_Values = pso.NN.classify(test_data,test_labels)
+                if regression == False: 
+                    #Decode the One Hot encoding Value 
+                    Estimation_Values = pso.NN.PickLargest(Estimation_Values)
+                    test_labels_list = pso.NN.PickLargest(test_labels)
+                    # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
+                    # print(Estimation_Values)
+                else: 
+                    Estimation_Values = Estimation_Values.tolist()
+                    test_labels_list = test_labels.tolist()[0]
+                    Estimation_Values = Estimation_Values[0]
+                
+                Estimat = Estimation_Values
+                groun = test_labels_list
+                
 
+                Nice = Per.ConvertResultsDataStructure(groun, Estimat)
+                # print("THE GROUND VERSUS ESTIMATION:")
+                # print(Nice)
+                """
+                hidden_layers = [input_size]
+                learning_rate = .01
+                momentum = 0
+                batch_size = 20
+                epochs = 500
+                """
+                #Meta Data order
+                h1 = 0 
+                h2 = 0 
+                #The number of hidden layers is 0 
+                if len(hidden_layers) == 0: 
+                    #No hidden layers so 0 
+                    h1 = 0 
+                    h2 = 0 
+                #THe number of hidden layers is 1 
+                elif len(hidden_layers) == 1: 
+                    #Set the number of nodes in the hidden layer 
+                    h1 = hidden_layers[0]
+                    #No layer so 0
+                    h2 = 0 
+                #The number of hidden layers is 2 
+                else: 
+                    #The number of nodes per hidden layer 
+                    h1 = hidden_layers[0]
+                    #The number of nodes per hidden layer 
+                    h2 = hidden_layers[1]
+
+                #[data set, number of h layers, node per h 1, nodes per h2, learning rate, momentum, batch size, number batches, number epochs]
+                Meta = [data_set, len(hidden_layers), h1, h2]
+                Per.StartLossFunction(regression, Nice, Meta, filename)
 
