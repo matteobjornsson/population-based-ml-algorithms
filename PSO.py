@@ -54,23 +54,27 @@ class PSO:
         # INIT BOTH *POSITION* (WEIGHTS) AND *VELOCITY*
 
         self.NN = NN
+        # dictates the range of possible initial positions and velocities
         self.position_range = 10
         self.velocity_range = 1
+        # store the list of nodes per layer
         self.layers = layers
         self.pop_size = pop_size
 
+        # generate the swarm population
         self.population = [] 
         for i in range(pop_size):
             self.population.append(Particle(self.position_range, self.velocity_range, layers))
-
+        # track the global best fitness. Initialized as inf as this is a min probelem
         self.gbest_fitness = float('inf')
         self.gbest_position = None
-        self.t = 0
+        # number of iterations 
         self.max_t = 1000
+
         #HYPERPARAMETERS:
-        self.omega = .5
+        self.omega = .9
         self.c1 = .3
-        self.c2 = .3
+        self.c2 = 1.2
         self.vmax = 10
         # fitness plotting:
         self.fitness_plot = []
@@ -88,7 +92,7 @@ class PSO:
             # x_(t+1) = x_t + v_(t+1)
             # v_(t+1) = w*v_t + c1*r1*(pb_t - x_t) + c2*r2*(gb_t - x_t)
         for p in self.population:
-
+            # assign variables to improve readability
             v = p.velocity
             w = self.omega
             c1 = self.c1
@@ -99,8 +103,9 @@ class PSO:
             gb = self.gbest_position
             x = p.position
 
+            # calculate the new velocity
             new_v = w*v + c1*r1*(pb - x) + c2*r2*(gb - x)
-
+            # update the new velocity and position
             p.velocity = new_v
             p.position += new_v
 
@@ -116,19 +121,27 @@ class PSO:
             weights = [None] * len(layers)
             weights[0] = []
             position = copy.copy(p.position)
+            # transform the flat position vector into a list of weight matrices
+            # for the neural network
             for i in range(len(layers)-1):
                 l = layers[i] * layers[i+1]
                 w = position[:l]
                 position = position[l:]
                 weights[i+1] = w.reshape(layers[i+1], layers[i])
+            # run the dataset through the NN with the particle's weights to get fitness
             fitness = self.NN.fitness(weights)
-            if p.fitness > fitness:
+            # update personal best
+            if p.pbest_fitness > fitness:
                 p.pbest_fitness = fitness
                 p.pbest_position = p.position
+            # update global best
             if self.gbest_fitness > fitness:
                 self.gbest_fitness = fitness
                 self.gbest_position = p.position
+            # update particle fitness
+            p.fitness = fitness
 
+        # track global best over time each iteration
         self.fitness_plot.append(self.gbest_fitness)
 
 
@@ -313,18 +326,25 @@ if __name__ == '__main__':
             for i in range(1):
                 i=2
                 hidden_layers = tuned_parameters[i]["hidden_layer"]
+                ############################## new code for PSO start ##################################
                 layers = [input_size] + hidden_layers + [output_size]
 
                 nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
                 nn.set_input_data(X,labels)
-                pso = PSO(layers, 10, nn)
+
+                pso = PSO(layers, 100, nn)
+
                 plt.ion
-                for j in range(100):
+                for j in range(40):
                     pso.update_fitness()
                     pso.update_position_and_velocity()
+                    print("particle 1 position and velocity: \nposition:\n", pso.population[1].position, '\nvelocity:\n', pso.population[1].velocity)
+                    print("particle 1 fitness: ", pso.population[1].fitness)
+                    print("global best fitness:", pso.gbest_fitness)
                     plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
                     plt.draw()
                     plt.pause(0.00001)
                     plt.clf()
+                ################################# new code for PSO end ###################################
 
 
