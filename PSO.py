@@ -356,15 +356,17 @@ if __name__ == '__main__':
 
                 position_range = [10]
                 velocity_range = [1]
-                omega = [.1, .2, .3, .4, .5, .6, .7, .8, .9]
-                c1 = [.1, .3, .5, .7, .9, 2, 5]
-                c2 = [.1, .3, .5, .7, .9, 2, 5]
-                vmax = [1, 3, 6, 9, 15]
-                pop_size = [2, 5, 10, 50, 100, 500, 1000]
+                omega = [.2, .5, .8 ]
+                c1 = [.1, .5, .9, 5]
+                c2 = [.1, .5, .9, 5]
+                vmax = [1, 7, 15]
+                pop_size = [10, 100, 1000]
 
                 for a in position_range:
                     for b in velocity_range:
                         for c in omega:
+                            # already tuned soybean up to .5
+                            if (data_set == "soybean" and c < .5) : continue
                             for d in c1:
                                 for e in c2:
                                     for f in vmax:
