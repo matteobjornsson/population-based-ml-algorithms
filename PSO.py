@@ -404,7 +404,7 @@ if __name__ == '__main__':
                                             # plt.ioff()
                                             plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
                                             img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
-                                            plt.savefig(img_name)
+                                            plt.savefig('tuning_plots/' + img_name)
                                             plt.clf()
 
                                             Estimation_Values = pso.NN.classify(test_data,test_labels)
