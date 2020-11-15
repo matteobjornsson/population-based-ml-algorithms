@@ -56,6 +56,13 @@ class GA:
         #TODO: figure out if we should init a NN here or pass in, etc. What layer does this file represent
         pass
 
+
+    #Generating the initial weights 
+    def GenerateWeights(): 
+        pass 
+
+
+
     ########################################
     # Evaluate the fitness of an individual
     ########################################
