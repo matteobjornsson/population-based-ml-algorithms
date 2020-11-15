@@ -47,36 +47,44 @@ class PSO:
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list, pop_size: int, NN:NeuralNetwork):
+    def __init__(self, layers: list, hyperparameters: dict, NN:NeuralNetwork):
         #init general population 
             # random weight values, weight matrix is numpy array, matches network architecture
             # use similar weight init function as from NN
 
         # INIT BOTH *POSITION* (WEIGHTS) AND *VELOCITY*
 
-        self.NN = NN
+        
+        ############### HYPERPARAMETERS: ################
         # dictates the range of possible initial positions and velocities
-        self.position_range = 10
-        self.velocity_range = 1
+        self.position_range = hyperparameters["position_range"]
+        self.velocity_range = hyperparameters["velocity_range"]
+        # size of inertia
+        self.omega = hyperparameters["omega"]
+        # size of cognitive component
+        self.c1 = hyperparameters["c1"]
+        # size of social component
+        self.c2 = hyperparameters["c2"]
+        # max possible velocity
+        self.vmax = hyperparameters["vmax"]
+        # popultion size
+        self.pop_size = hyperparameters["pop_size"]
+        ###################################################
         # store the list of nodes per layer
         self.layers = layers
-        self.pop_size = pop_size
+        self.NN = NN
 
         # generate the swarm population
         self.population = [] 
-        for i in range(pop_size):
+        for i in range(self.pop_size):
             self.population.append(Particle(self.position_range, self.velocity_range, layers))
         # track the global best fitness. Initialized as inf as this is a min probelem
         self.gbest_fitness = float('inf')
         self.gbest_position = None
         # number of iterations 
-        self.max_t = 1000
+        self.max_t = 100
 
-        #HYPERPARAMETERS:
-        self.omega = .9
-        self.c1 = .3
-        self.c2 = 1.2
-        self.vmax = 10
+
         # fitness plotting:
         self.fitness_plot = []
 
@@ -92,6 +100,7 @@ class PSO:
             # update v and x using equations from class
             # x_(t+1) = x_t + v_(t+1)
             # v_(t+1) = w*v_t + c1*r1*(pb_t - x_t) + c2*r2*(gb_t - x_t)
+        # use velocity clamping on v_max
         for p in self.population:
             # assign variables to improve readability
             v = p.velocity
@@ -106,6 +115,13 @@ class PSO:
 
             # calculate the new velocity
             new_v = w*v + c1*r1*(pb - x) + c2*r2*(gb - x)
+
+            # clamp velocity to vmax if greater than vmax or less than -vmax.
+            # these two lines use numpy functions to select values for which the 
+            # conditional is true and set them to vmax
+            new_v[new_v > self.vmax] = self.vmax
+            new_v[new_v < -self.vmax] = -self.vmax
+
             # update the new velocity and position
             p.velocity = new_v
             p.position += new_v
@@ -155,8 +171,8 @@ class PSO:
 
 if __name__ == '__main__':
 
-    headers = ["Data set", "Hidden Layers", "h1 nodes", "h2 nodes", "learning rate", "momentum", "batch size", "batches", "epochs", "loss1", "loss2"]
-    filename = 'PSO_test.csv'
+    headers = ["Data set", "layers", "position_range", "velocity_range", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
+    filename = 'PSO_tuning.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -297,8 +313,7 @@ if __name__ == '__main__':
         }
     }
     for data_set in data_sets:
-        if data_set != "machine": continue
-        for j in range(1):
+        for j in range(3):
             
             du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
             # ten fold data and labels is a list of [data, labels] pairs, where 
@@ -331,8 +346,7 @@ if __name__ == '__main__':
             data_set_size = X.shape[1] + test_data.shape[1]
 
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
-            for i in range(1):
-                i=2
+            for i in range(3):
                 hidden_layers = tuned_parameters[i]["hidden_layer"]
                 ############################## new code for PSO start ##################################
                 layers = [input_size] + hidden_layers + [output_size]
@@ -340,69 +354,81 @@ if __name__ == '__main__':
                 nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
                 nn.set_input_data(X,labels)
 
-                pso = PSO(layers, 100, nn)
+                position_range = [10]
+                velocity_range = [1]
+                omega = [.1, .2, .3, .4, .5, .6, .7, .8, .9]
+                c1 = [.1, .3, .5, .7, .9, 2, 5]
+                c2 = [.1, .3, .5, .7, .9, 2, 5]
+                vmax = [1, 3, 6, 9, 15]
+                pop_size = [2, 5, 10, 50, 100, 500, 1000]
 
-                plt.ion
-                for j in range(40):
-                    pso.update_fitness()
-                    pso.update_position_and_velocity()
-                    print("particle 1 position and velocity: \nposition:\n", pso.population[1].position, '\nvelocity:\n', pso.population[1].velocity)
-                    print("particle 1 fitness: ", pso.population[1].fitness)
-                    print("global best fitness:", pso.gbest_fitness)
-                    plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                    plt.draw()
-                    plt.pause(0.00001)
-                    plt.clf()
-                ################################# new code for PSO end ###################################
-                
-                Estimation_Values = pso.NN.classify(test_data,test_labels)
-                if regression == False: 
-                    #Decode the One Hot encoding Value 
-                    Estimation_Values = pso.NN.PickLargest(Estimation_Values)
-                    test_labels_list = pso.NN.PickLargest(test_labels)
-                    # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
-                    # print(Estimation_Values)
-                else: 
-                    Estimation_Values = Estimation_Values.tolist()
-                    test_labels_list = test_labels.tolist()[0]
-                    Estimation_Values = Estimation_Values[0]
-                
-                Estimat = Estimation_Values
-                groun = test_labels_list
-                
+                for a in position_range:
+                    for b in velocity_range:
+                        for c in omega:
+                            for d in c1:
+                                for e in c2:
+                                    for f in vmax:
+                                        for g in pop_size:
+                                            hyperparameters = {
+                                                "position_range": a,
+                                                "velocity_range": b,
+                                                "omega": c,
+                                                "c1": d,
+                                                "c2": e,
+                                                "vmax": f,
+                                                "pop_size": g                                                
+                                                }
+                                            # hyperparameters = {
+                                            #     "position_range": 10,
+                                            #     "velocity_range": 1,
+                                            #     "omega": .5,
+                                            #     "c1": .3,
+                                            #     "c2": .3,
+                                            #     "vmax": 10,
+                                            #     "pop_size": 100                                                
+                                            #     }
+                                            pso = PSO(layers, hyperparameters, nn)
 
-                Nice = Per.ConvertResultsDataStructure(groun, Estimat)
-                # print("THE GROUND VERSUS ESTIMATION:")
-                # print(Nice)
-                """
-                hidden_layers = [input_size]
-                learning_rate = .01
-                momentum = 0
-                batch_size = 20
-                epochs = 500
-                """
-                #Meta Data order
-                h1 = 0 
-                h2 = 0 
-                #The number of hidden layers is 0 
-                if len(hidden_layers) == 0: 
-                    #No hidden layers so 0 
-                    h1 = 0 
-                    h2 = 0 
-                #THe number of hidden layers is 1 
-                elif len(hidden_layers) == 1: 
-                    #Set the number of nodes in the hidden layer 
-                    h1 = hidden_layers[0]
-                    #No layer so 0
-                    h2 = 0 
-                #The number of hidden layers is 2 
-                else: 
-                    #The number of nodes per hidden layer 
-                    h1 = hidden_layers[0]
-                    #The number of nodes per hidden layer 
-                    h2 = hidden_layers[1]
+                                            # plt.ion
+                                            for j in range(pso.max_t):
+                                                pso.update_fitness()
+                                                pso.update_position_and_velocity()
+                                                # print("particle 1 position and velocity: \nposition:\n", pso.population[1].position, '\nvelocity:\n', pso.population[1].velocity)
+                                                # print("particle 1 fitness: ", pso.population[1].fitness)
+                                                # print("global best fitness:", pso.gbest_fitness)
+                                                # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                                                # plt.draw()
+                                                # plt.pause(0.00001)
+                                                # plt.clf()
+                                            ################################# new code for PSO end ###################################
+                                            # plt.ioff()
+                                            plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                                            img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
+                                            plt.savefig(img_name)
+                                            plt.clf()
 
-                #[data set, number of h layers, node per h 1, nodes per h2, learning rate, momentum, batch size, number batches, number epochs]
-                Meta = [data_set, len(hidden_layers), h1, h2]
-                Per.StartLossFunction(regression, Nice, Meta, filename)
+                                            Estimation_Values = pso.NN.classify(test_data,test_labels)
+                                            if regression == False: 
+                                                #Decode the One Hot encoding Value 
+                                                Estimation_Values = pso.NN.PickLargest(Estimation_Values)
+                                                test_labels_list = pso.NN.PickLargest(test_labels)
+                                                # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
+                                                # print(Estimation_Values)
+                                            else: 
+                                                Estimation_Values = Estimation_Values.tolist()
+                                                test_labels_list = test_labels.tolist()[0]
+                                                Estimation_Values = Estimation_Values[0]
+                                            
+                                            Estimat = Estimation_Values
+                                            groun = test_labels_list
+                                            
+
+                                            Nice = Per.ConvertResultsDataStructure(groun, Estimat)
+                                            # print("THE GROUND VERSUS ESTIMATION:")
+                                            # print(Nice)
+                                        
+
+                                            # headers = ["Data set", "layers", "position_range", "velocity_range", "omega", "c1", "c2", "vmax", "pop_size"]
+                                            Meta = [data_set, len(hidden_layers), a, b, c, d, e, f, g]
+                                            Per.StartLossFunction(regression, Nice, Meta, filename)
 
