@@ -346,8 +346,8 @@ if __name__ == '__main__':
             data_set_size = X.shape[1] + test_data.shape[1]
 
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
-            for i in range(3):
-                hidden_layers = tuned_parameters[i]["hidden_layer"]
+            for z in range(3):
+                hidden_layers = tuned_parameters[z]["hidden_layer"]
                 ############################## new code for PSO start ##################################
                 layers = [input_size] + hidden_layers + [output_size]
 
@@ -390,7 +390,7 @@ if __name__ == '__main__':
                                             pso = PSO(layers, hyperparameters, nn)
 
                                             # plt.ion
-                                            for j in range(pso.max_t):
+                                            for epoch in range(pso.max_t):
                                                 pso.update_fitness()
                                                 pso.update_position_and_velocity()
                                                 # print("particle 1 position and velocity: \nposition:\n", pso.population[1].position, '\nvelocity:\n', pso.population[1].velocity)
