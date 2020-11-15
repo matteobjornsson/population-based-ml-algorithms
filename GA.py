@@ -3,14 +3,28 @@ class individual:
     
     def __init__(self):
         self.fitness = 10
+        #How big should each chromosome be? My initial assumption is the number of feature vectors across the board 
         self.chromosome = [] # some numpy == weights
 
+
+    def SetChromie(Feature_Size):
+        #Loop through each index up until the number of features and just set it to 0 
+        for i in range(Feature_Size): 
+            self.chromosome[i] = 0  
+
+    def ReturnChromie():
+        return self.chromosome
+
+    def printChromie(): 
+        for i in self.chromosome: 
+            print(i)
 
 class GA:
     #hyperparameter?
     pop_size = 10
     population = [] #TODO: what data structure to use here?
     genetation = 0
+    Chromosome_Size = 10 
     # hyperparameter!
     probability_of_crossover = .5 
 
@@ -19,6 +33,18 @@ class GA:
     ####################
     def __init__(self, layers: list):
         #init general population 
+        #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
+        #Create a list to hold all of the individual objects and set each one with random weights to then send through the algorithm 
+        Population = list() 
+        #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
+        for i in range(pop_size): 
+            #Create a new individual object 
+            temp = self.individual(Chromosome_Size)
+            
+            
+            #Add the individual to the list of total population 
+            Population.append(temp)
+
             # random weight values, weight matrix is numpy array, matches network architecture
             # use similar weight init function as from NN
 
@@ -72,3 +98,15 @@ class GA:
             # evaluate fitness of new individuals
             # replace existing population
         pass
+
+
+
+if __name__ == '__main__':
+    print("Program Start")
+
+
+
+
+
+
+    print("Program End ")
