@@ -1,3 +1,6 @@
+import numpy as np
+import math
+
 
 class individual:
     
@@ -39,9 +42,11 @@ class GA:
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
         for i in range(pop_size): 
             #Create a new individual object 
-            temp = self.individual(Chromosome_Size)
-            
-            
+            temp = self.individual()
+            #Initialize an empty list of weights 0s
+            temp.setChromie(Chromosome_Size)
+            #Now randomly generate values to start for each of these sizes 
+
             #Add the individual to the list of total population 
             Population.append(temp)
 
