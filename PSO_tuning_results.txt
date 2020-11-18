@@ -1,0 +1,44 @@
+PSO tune: 
+
+abalone 0 layer
+	omega = .2
+	c1 = 5
+	c2 = .9
+	vmax = 1
+	population size = 1000
+
+abalone 1 layer
+	omega = .2
+	c1 = .1
+	c2 = 5
+	vmax = 1
+	pop = 1000
+
+abalone 2 layer
+	omega = .2
+	c1 = 5
+	c2 = 5
+	vmax = 1
+	pop = 1000
+
+Cancer 0 layer
+	omega = .5
+	c1 = .5
+	c2 = 5
+	vmax = 1
+	pop = 1000
+
+Cancer 1 layer
+	omega = .2
+	c1 = .5
+	c2 = 5
+	vmax = 1
+	pop = 1000
+
+Cancer 2 layer
+	omega = 0.2
+	c1 = .5
+	c2 = 5
+	vmax = 1
+	pop = 1000
+
