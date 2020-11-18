@@ -6864,11 +6864,9 @@ soybean,0,10,1,0.5,0.1,0.1,1,5,80,72
 soybean,0,10,1,0.5,0.1,0.1,1,10,100,100
 soybean,0,10,1,0.5,0.1,0.1,1,50,100,100
 soybean,0,10,1,0.5,0.1,0.1,1,100,100,100
-Data set,layers,position_range,velocity_range,omega,c1,c2,vmax,pop_size,loss1,loss2
 soybean,0,10,1,0.5,0.1,0.1,1,10,60,60
 soybean,0,10,1,0.5,0.1,0.1,1,100,100,100
 soybean,0,10,1,0.5,0.1,0.1,1,1000,100,100
-Data set,layers,position_range,velocity_range,omega,c1,c2,vmax,pop_size,loss1,loss2
 soybean,0,10,1,0.5,0.1,0.1,1,10,40,22.8571428571429
 soybean,0,10,1,0.5,0.1,0.1,1,100,100,100
 soybean,0,10,1,0.5,0.1,0.1,1,1000,100,100
