@@ -172,7 +172,7 @@ class PSO:
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "position_range", "velocity_range", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
-    filename = 'PSO_tuning.csv'
+    filename = 'PSO_tuning_soy_fix.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -313,6 +313,7 @@ if __name__ == '__main__':
         }
     }
     for data_set in data_sets:
+        if data_set != "soybean": continue
         for j in range(3):
             
             du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
@@ -359,14 +360,12 @@ if __name__ == '__main__':
                 omega = [.2, .5, .8 ]
                 c1 = [.1, .5, .9, 5]
                 c2 = [.1, .5, .9, 5]
-                vmax = [1, 7, 15]
-                pop_size = [10, 100, 1000]
+                vmax = [1]
+                pop_size = [1000]
 
                 for a in position_range:
                     for b in velocity_range:
                         for c in omega:
-                            # already tuned soybean up to .5
-                            if (data_set == "soybean" and c < .5) : continue
                             for d in c1:
                                 for e in c2:
                                     for f in vmax:
@@ -404,10 +403,10 @@ if __name__ == '__main__':
                                                 # plt.clf()
                                             ################################# new code for PSO end ###################################
                                             # plt.ioff()
-                                            plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                                            img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
-                                            plt.savefig('tuning_plots/' + img_name)
-                                            plt.clf()
+                                            # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                                            # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
+                                            # plt.savefig('tuning_plots/' + img_name)
+                                            # plt.clf()
 
                                             Estimation_Values = pso.NN.classify(test_data,test_labels)
                                             if regression == False: 
