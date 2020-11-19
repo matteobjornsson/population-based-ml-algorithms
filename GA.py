@@ -7,7 +7,7 @@ class individual:
     def __init__(self):
         self.fitness = 10
         #How big should each chromosome be? My initial assumption is the number of feature vectors across the board 
-        self.chromosome = [] # some numpy == weights
+        self.chromosome = list() # some numpy == weights
 
 
     def InitChromie(Feature_Size):
@@ -15,8 +15,8 @@ class individual:
         for i in range(Feature_Size): 
             self.chromosome[i] = 0  
 
-    def SetChromie(): 
-        pass
+    def SetChromie(Chromos): 
+        self.chromosome = Chromos
 
     def ReturnChromie():
         return self.chromosome
@@ -47,7 +47,7 @@ class GA:
             #Initialize an empty list of weights 0s
             temp.InitChromie(Chromosome_Size)
             #Now randomly generate values to start for each of these sizes 
-
+            
 
 
             #Add the individual to the list of total population 
@@ -62,7 +62,22 @@ class GA:
 
     #Generating the initial weights 
     def GenerateWeights(): 
-        pass 
+        # initialize weights randomly, close to 0
+        # generate the matrices that hold the input weights for each layer. Maybe return a list of matrices?
+        # will need 1 weight matrix for 0 hidden layers, 2 for 1 hidden layer, 3 for 2 hidden layer. 
+        weights = []
+        counts = self.layer_node_count
+        for i in range(self.layers):
+            if i == 0:
+                weights.append([])
+            else:
+                # initialze a (notes, inputs) dimension matrix for each layer. 
+                # layer designated by order of append (position in weights list)
+                layer_nodes = counts[i]
+                layer_inputs = counts[i-1]
+                weights.append(np.random.randn(layer_nodes, layer_inputs) * 1/layer_inputs) # or * 0.01
+        self.initial_weights = weights
+        return weights
 
 
 
