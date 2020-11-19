@@ -7,7 +7,7 @@ class individual:
     def __init__(self):
         self.fitness = 10
         #How big should each chromosome be? My initial assumption is the number of feature vectors across the board 
-        self.chromosome = list() # some numpy == weights
+        self.chromosome = [] # some numpy == weights
 
 
     def InitChromie(Feature_Size):
@@ -37,7 +37,9 @@ class GA:
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list):
+    def __init__(self, layers: list, LayerCount):
+
+        self.Layer_Node_Count = LayerCount
         #init general population 
         #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
@@ -47,7 +49,7 @@ class GA:
             #Initialize an empty list of weights 0s
             temp.InitChromie(Chromosome_Size)
             #Now randomly generate values to start for each of these sizes 
-            
+            temp.setChromie(self.GenerateWeights())
 
 
             #Add the individual to the list of total population 
@@ -76,7 +78,6 @@ class GA:
                 layer_nodes = counts[i]
                 layer_inputs = counts[i-1]
                 weights.append(np.random.randn(layer_nodes, layer_inputs) * 1/layer_inputs) # or * 0.01
-        self.initial_weights = weights
         return weights
 
 
