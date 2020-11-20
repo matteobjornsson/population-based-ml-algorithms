@@ -149,7 +149,7 @@ class GA:
             Child2.InitChromie(Parent2.getsize())
             for i in range(Parent1.getsize()):
                 score = random.randint(0,99) + 1
-                if score > 49: 
+                if score > 50: 
                     bit = Parent1.getChromie()
                     bit = bit[i]
                 else: 
@@ -157,7 +157,7 @@ class GA:
                     bit = bit[i]
                 NewChromoC1.append(bit)
                 score = random.randint(0,99) + 1
-                if score > 49: 
+                if score > 50: 
                     bit = Parent1.getChromie()
                     bit = bit[i]
                 else: 
@@ -172,6 +172,7 @@ class GA:
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
             self.population.remove(self.population[Kill])
+        self.mutate()
 
     ###################################
     # introduce random change to each individual in the generation
@@ -182,9 +183,8 @@ class GA:
             if perc < 85: 
                 continue 
             else: 
-                
-
-                #What to mutate and to what? 
+                Mutation = GenerateWeights()
+                i.setChromie(Mutation)  
 
 ##################################
 # Main function down here? 
