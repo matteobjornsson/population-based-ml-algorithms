@@ -49,6 +49,7 @@ class GA:
         self.Chromosome_Size = Feature_Size 
         #Take in a neural Network 
         self.nn = NN 
+        self.fit = list() 
         #init general population 
         #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
@@ -95,11 +96,10 @@ class GA:
     # Evaluate the fitness of an individual
     ########################################
     def fitness(self, individual) -> float:
-        fit = list() 
         #Fitness Function will be Mean Absolute Error
         for i in self.population:  
             fitscore = self.nn.fitness(i.getChromie()) 
-            fit.append(fitscore)
+            self.fit.append(fitscore)
         
         # this applies the individual's weights to the NN, feeds data set through and returns error of forward pass
         # TODO: figure out if we pass through entire dataset, or batch, etc. 
@@ -115,7 +115,23 @@ class GA:
         # TODO: pick the selection mechanism
             # proportionate, rank, or tournament
             # use rank? would work well with a max priority queue/heap
-        pass
+        newPopulation = list()
+        newFitness = list()  
+        Subset = 0 
+        Subset = self.pop_size / 2 
+        for i in range(Subset): 
+            mins = 0
+            #Find the minimum subset times 
+            for i in range(len(self.fit)):
+                if self.fit[mins] < self.fit[i]: 
+                    mins = i 
+                continue 
+            newFitness.append(self.fit[mins])
+            self.fit.remove(self.fit[mins])
+            newPopulation.append(self.population[mins])
+            self.population.remove(self.population[mins])
+        self.population = newPopulation
+        self.fit = newFitness
 
     ####################################
     # make new generation based on parent selection by swapping chromosomes 
