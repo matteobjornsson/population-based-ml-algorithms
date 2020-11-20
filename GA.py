@@ -69,9 +69,6 @@ class GA:
             # random weight values, weight matrix is numpy array, matches network architecture
             # use similar weight init function as from NN
 
-        #TODO: figure out if we should init a NN here or pass in, etc. What layer does this file represent
-        pass
-
 
     #Generating the initial weights 
     def GenerateWeights(): 
@@ -139,10 +136,10 @@ class GA:
     def crossover(self, set_of_all_selected_parents): 
         #TODO: pick crossover mechanism (uniform?)
 
+
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
             self.population.remove(self.population[Kill])
-        pass
 
     ###################################
     # introduce random change to each individual in the generation
@@ -153,9 +150,7 @@ class GA:
             if perc < 85: 
                 continue 
             else: 
-                #Randomly 
-            #Roll a percentage and see if the percentage satisfies the need to mutate 
-        pass
+                #What to mutate and to what? 
 
 ##################################
 # Main function down here? 
