@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import random 
 
 
 class individual:
@@ -116,6 +117,8 @@ class GA:
         newFitness = list()  
         Subset = 0 
         Subset = self.pop_size / 2 
+        if Subset % 2 == 1: 
+            Subset = Subset + 1 
         for i in range(Subset): 
             mins = 0
             #Find the minimum subset times 
@@ -135,14 +138,23 @@ class GA:
     ####################################
     def crossover(self, set_of_all_selected_parents): 
         #TODO: pick crossover mechanism (uniform?)
-        #TODO: how many individuals are we generating? Entirely new population? 
+
+        while(len(self.population) > self.pop_size): 
+            Kill = random.randint(0,len(self.population))
+            self.population.remove(self.population[Kill])
         pass
 
     ###################################
     # introduce random change to each individual in the generation
     ###############################
     def mutate(self, new_generation):
-        #TODO: pick mutation mechanism.
+        for i in self.population: 
+            perc = random.randint(0,99) + 1 
+            if perc < 85: 
+                continue 
+            else: 
+                #Randomly 
+            #Roll a percentage and see if the percentage satisfies the need to mutate 
         pass
 
 ##################################
