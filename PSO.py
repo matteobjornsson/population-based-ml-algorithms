@@ -82,7 +82,7 @@ class PSO:
         self.gbest_fitness = float('inf')
         self.gbest_position = None
         # number of iterations 
-        self.max_t = 100
+        self.max_t = 1000
 
 
         # fitness plotting:
@@ -171,8 +171,8 @@ class PSO:
 
 if __name__ == '__main__':
 
-    headers = ["Data set", "layers", "position_range", "velocity_range", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
-    filename = 'PSO_tuning_soy_fix.csv'
+    headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
+    filename = 'PSO_experimental_results.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -198,128 +198,129 @@ if __name__ == '__main__':
 
     tuned_0_hl = {
         "soybean": {
-            "learning_rate": .001,
-            "batch_count": 5,
-            "epoch": 5000,
+            "omega": .5,
+            "c1": .1,
+            "c2": 5,
             "hidden_layer": []
         },
         "Cancer": {
-            "learning_rate": .00001,
-            "batch_count": 20,
-            "epoch": 10000,
+            "omega": .5,
+            "c1": .5,
+            "c2": 5,
             "hidden_layer": []
         },
         "glass": {
-            "learning_rate": .1,
-            "batch_count": 5,
-            "epoch": 10000,
+            "omega": .2,
+            "c1": .9,
+            "c2": 5,
             "hidden_layer": []
         },
         "forestfires": {
-            "learning_rate": .00001,
-            "batch_count": 10,
-            "epoch": 10000,
+            "omega": .2,
+            "c1": 5,
+            "c2": .5,
             "hidden_layer": []
         },
         "machine": {
-            "learning_rate": .1,
-            "batch_count": 5,
-            "epoch": 10000,
+            "omega": .5,
+            "c1": .9,
+            "c2": 5,
             "hidden_layer": []
         },
         "abalone": {
-            "learning_rate": .01,
-            "batch_count": 10,
-            "epoch": 10000,
+            "omega": .2,
+            "c1": 5,
+            "c2": .9,
             "hidden_layer": []
         }
     }
 
     tuned_1_hl = {
         "soybean": {
-            "learning_rate": .001,
-            "batch_count": 10,
-            "epoch": 10000,
+            "omega": .5,
+            "c1": .5,
+            "c2": 1,
             "hidden_layer": [7]
         },
         "Cancer": {
-            "learning_rate": .000001,
-            "batch_count": 5,
-            "epoch": 500000,
+            "omega": .2,
+            "c1": .5,
+            "c2": 5,
             "hidden_layer": [4]
         },
         "glass": {
-            "learning_rate": .001,
-            "batch_count": 10,
-            "epoch": 10000,
+            "omega": .2,
+            "c1": .9,
+            "c2": 5,
             "hidden_layer": [8]
         },
         "forestfires": {
-            "learning_rate": .00001,
-            "batch_count": 5,
-            "epoch": 50000,
+            "omega": .2,
+            "c1": 5,
+            "c2": 5,
             "hidden_layer": [8]
         },
         "machine": {
-            "learning_rate": .001,
-            "batch_count": 5,
-            "epoch": 10000,
+            "omega": .5,
+            "c1": 5,
+            "c2": .5,
             "hidden_layer": [4]
         },
         "abalone": {
-            "learning_rate": .01,
-            "batch_count": 5,
-            "epoch": 10000,
+            "omega": .2,
+            "c1": .1,
+            "c2": 5,
             "hidden_layer": [8]
         }
     }
 
     tuned_2_hl = {
         "soybean": {
-            "learning_rate": .001,
-            "batch_count": 5,
-            "epoch": 50000,
+            "omega": .5,
+            "c1": .9,
+            "c2": .1,
             "hidden_layer": [7,12]
         },
         "Cancer": {
-            "learning_rate": .00000001,
-            "batch_count": 5,
-            "epoch": 500000,
+            "omega": .2,
+            "c1": .5,
+            "c2": 5,
             "hidden_layer": [4,4]
         },
         "glass": {
-            "learning_rate": .001,
-            "batch_count": 5,
-            "epoch": 10000,
+            "omega": .2,
+            "c1": .9,
+            "c2": 5,
             "hidden_layer": [8,6]
         },
         "forestfires": {
-            "learning_rate": .0001,
-            "batch_count": 10,
-            "epoch": 50000,
+            "omega": .2,
+            "c1": .9,
+            "c2": 5,
             "hidden_layer": [8,8]
         },
         "machine": {
-            "learning_rate": .001,
-            "batch_count": 5,
-            "epoch": 10000,
+            "omega": .2,
+            "c1": .9,
+            "c2": .1,
             "hidden_layer": [7,2]
         },
         "abalone": {
-            "learning_rate": .001,
-            "batch_count": 10,
-            "epoch": 5000,
+            "omega": .2,
+            "c1": 5,
+            "c2": 5,
             "hidden_layer": [6,8]
         }
     }
+    du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
+    total_counter = 0
     for data_set in data_sets:
-        if data_set != "soybean": continue
-        for j in range(3):
-            
-            du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
-            # ten fold data and labels is a list of [data, labels] pairs, where 
-            # data and labels are numpy arrays:
-            tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
+        data_set_counter = 0
+        # ten fold data and labels is a list of [data, labels] pairs, where 
+        # data and labels are numpy arrays:
+        tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
+
+        for j in range(10):
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -342,6 +343,7 @@ if __name__ == '__main__':
                 test_labels = du.ConvertLabels(test_labels, output_size)
                 #Get the Labels into a One hot encoding 
                 labels = du.ConvertLabels(labels, output_size)
+
             input_size = X.shape[0]
 
             data_set_size = X.shape[1] + test_data.shape[1]
@@ -349,87 +351,73 @@ if __name__ == '__main__':
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
-                ############################## new code for PSO start ##################################
+
+                hyperparameters = {
+                    "position_range": 10,
+                    "velocity_range": 1,
+                    "omega": tuned_parameters[z]["omega"],
+                    "c1": tuned_parameters[z]["c1"],
+                    "c2": tuned_parameters[z]["c2"],
+                    "vmax": 1,
+                    "pop_size": 1000                                                
+                    }
+                if data_set == "soybean": hyperparameters["vmax"] = 7
+
                 layers = [input_size] + hidden_layers + [output_size]
 
                 nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
                 nn.set_input_data(X,labels)
 
-                position_range = [10]
-                velocity_range = [1]
-                omega = [.2, .5, .8 ]
-                c1 = [.1, .5, .9, 5]
-                c2 = [.1, .5, .9, 5]
-                vmax = [1]
-                pop_size = [1000]
+                pso = PSO(layers, hyperparameters, nn)
 
-                for a in position_range:
-                    for b in velocity_range:
-                        for c in omega:
-                            for d in c1:
-                                for e in c2:
-                                    for f in vmax:
-                                        for g in pop_size:
-                                            hyperparameters = {
-                                                "position_range": a,
-                                                "velocity_range": b,
-                                                "omega": c,
-                                                "c1": d,
-                                                "c2": e,
-                                                "vmax": f,
-                                                "pop_size": g                                                
-                                                }
-                                            # hyperparameters = {
-                                            #     "position_range": 10,
-                                            #     "velocity_range": 1,
-                                            #     "omega": .5,
-                                            #     "c1": .3,
-                                            #     "c2": .3,
-                                            #     "vmax": 10,
-                                            #     "pop_size": 100                                                
-                                            #     }
-                                            pso = PSO(layers, hyperparameters, nn)
+                # plt.ion
+                for epoch in range(pso.max_t):
+                    pso.update_fitness()
+                    pso.update_position_and_velocity()
+                    # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                    # plt.draw()
+                    # plt.pause(0.00001)
+                    # plt.clf()
+                ################################# new code for PSO end ###################################
+                # plt.ioff()
+                # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
+                # plt.savefig('tuning_plots/' + img_name)
+                # plt.clf()
 
-                                            # plt.ion
-                                            for epoch in range(pso.max_t):
-                                                pso.update_fitness()
-                                                pso.update_position_and_velocity()
-                                                # print("particle 1 position and velocity: \nposition:\n", pso.population[1].position, '\nvelocity:\n', pso.population[1].velocity)
-                                                # print("particle 1 fitness: ", pso.population[1].fitness)
-                                                # print("global best fitness:", pso.gbest_fitness)
-                                                # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                                                # plt.draw()
-                                                # plt.pause(0.00001)
-                                                # plt.clf()
-                                            ################################# new code for PSO end ###################################
-                                            # plt.ioff()
-                                            # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                                            # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
-                                            # plt.savefig('tuning_plots/' + img_name)
-                                            # plt.clf()
+                Estimation_Values = pso.NN.classify(test_data,test_labels)
+                if regression == False: 
+                    #Decode the One Hot encoding Value 
+                    Estimation_Values = pso.NN.PickLargest(Estimation_Values)
+                    test_labels_list = pso.NN.PickLargest(test_labels)
+                    # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
+                    # print(Estimation_Values)
+                else: 
+                    Estimation_Values = Estimation_Values.tolist()
+                    test_labels_list = test_labels.tolist()[0]
+                    Estimation_Values = Estimation_Values[0]
+                
+                Estimat = Estimation_Values
+                groun = test_labels_list
+                
 
-                                            Estimation_Values = pso.NN.classify(test_data,test_labels)
-                                            if regression == False: 
-                                                #Decode the One Hot encoding Value 
-                                                Estimation_Values = pso.NN.PickLargest(Estimation_Values)
-                                                test_labels_list = pso.NN.PickLargest(test_labels)
-                                                # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
-                                                # print(Estimation_Values)
-                                            else: 
-                                                Estimation_Values = Estimation_Values.tolist()
-                                                test_labels_list = test_labels.tolist()[0]
-                                                Estimation_Values = Estimation_Values[0]
-                                            
-                                            Estimat = Estimation_Values
-                                            groun = test_labels_list
-                                            
+                Nice = Per.ConvertResultsDataStructure(groun, Estimat)
+                # print("THE GROUND VERSUS ESTIMATION:")
+                # print(Nice)
+            
 
-                                            Nice = Per.ConvertResultsDataStructure(groun, Estimat)
-                                            # print("THE GROUND VERSUS ESTIMATION:")
-                                            # print(Nice)
-                                        
-
-                                            # headers = ["Data set", "layers", "position_range", "velocity_range", "omega", "c1", "c2", "vmax", "pop_size"]
-                                            Meta = [data_set, len(hidden_layers), a, b, c, d, e, f, g]
-                                            Per.StartLossFunction(regression, Nice, Meta, filename)
+                # headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size"]
+                Meta = [
+                    data_set, 
+                    len(hidden_layers), 
+                    hyperparameters["omega"], 
+                    hyperparameters["c1"], 
+                    hyperparameters["c2"],
+                    hyperparameters["vmax"],
+                    1000 # pop size
+                    ]
+                Per.StartLossFunction(regression, Nice, Meta, filename)
+                print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
+                data_set_counter += 1
+                total_counter += 1
 
