@@ -98,7 +98,6 @@ class GA:
         for i in self.population:  
             fitscore = self.nn.fitness(i.getChromie()) 
             self.fit.append(fitscore)
-        pass
 
     ##################################
     # pick a subset of POP based on fitness OR some sort of random or ranked selection
@@ -135,7 +134,12 @@ class GA:
     ####################################
     def crossover(self, set_of_all_selected_parents): 
         #TODO: pick crossover mechanism (uniform?)
-
+        for i in range(len(self.population))-1: 
+            Parent1 = self.population[i]
+            Parent2 = self.population[i+1]
+            Child1 = self.individual()
+            Child2 = self.individual()
+            
 
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
