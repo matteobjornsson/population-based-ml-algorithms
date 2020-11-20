@@ -145,7 +145,7 @@ class GA:
             Child1.InitChromie(Parent1.getsize())
             Child2.InitChromie(Parent2.getsize())
 
-
+            #Proper Cross Over Tactic 
 
             NewPop.append(Child1)
             NewPop.append(Child2)
