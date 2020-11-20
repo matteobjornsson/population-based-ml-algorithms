@@ -100,9 +100,6 @@ class GA:
         for i in self.population:  
             fitscore = self.nn.fitness(i.getChromie()) 
             self.fit.append(fitscore)
-        
-        # this applies the individual's weights to the NN, feeds data set through and returns error of forward pass
-        # TODO: figure out if we pass through entire dataset, or batch, etc. 
         pass
 
     ##################################
