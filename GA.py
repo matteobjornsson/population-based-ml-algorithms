@@ -133,13 +133,19 @@ class GA:
     # make new generation based on parent selection by swapping chromosomes 
     ####################################
     def crossover(self, set_of_all_selected_parents): 
+        NewPop = list()
         #TODO: pick crossover mechanism (uniform?)
         for i in range(len(self.population))-1: 
             Parent1 = self.population[i]
             Parent2 = self.population[i+1]
             Child1 = self.individual()
             Child2 = self.individual()
+
+
+
             
+            NewPop.append(Child1)
+            NewPop.append(Child2)
 
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
@@ -154,6 +160,7 @@ class GA:
             if perc < 85: 
                 continue 
             else: 
+
                 #What to mutate and to what? 
 
 ##################################
