@@ -21,6 +21,8 @@ class individual:
         self.chromosome = Chromos
     def SetSize(si): 
         self.Size = si 
+    def getsize(): 
+        return self.size
     def getChromie(): 
         return self.chromosome 
 
@@ -140,10 +142,11 @@ class GA:
             Parent2 = self.population[i+1]
             Child1 = self.individual()
             Child2 = self.individual()
+            Child1.InitChromie(Parent1.getsize())
+            Child2.InitChromie(Parent2.getsize())
 
 
 
-            
             NewPop.append(Child1)
             NewPop.append(Child2)
 
