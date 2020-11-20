@@ -8,6 +8,7 @@ class individual:
         self.fitness = 10
         #How big should each chromosome be? My initial assumption is the number of feature vectors across the board 
         self.chromosome = [] # some numpy == weights
+        self.Size = 0 
 
 
     def InitChromie(Feature_Size):
@@ -17,6 +18,10 @@ class individual:
 
     def SetChromie(Chromos): 
         self.chromosome = Chromos
+    def SetSize(si): 
+        self.Size = si 
+    def getChromie(): 
+        return self.chromosome 
 
     def ReturnChromie():
         return self.chromosome
@@ -37,21 +42,25 @@ class GA:
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list, LayerCount):
+    def __init__(self, layers: list, LayerCount,Feature_Size,NN):
 
         self.Layer_Node_Count = LayerCount
+        #SEt the size to be the number of features 
+        self.Chromosome_Size = Feature_Size 
+        #Take in a neural Network 
+        self.nn = NN 
         #init general population 
         #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
         for i in range(pop_size): 
             #Create a new individual object 
             temp = self.individual()
+            #Set the array size 
+            temp.SetSize(Feature_Size)
             #Initialize an empty list of weights 0s
             temp.InitChromie(Chromosome_Size)
             #Now randomly generate values to start for each of these sizes 
             temp.setChromie(self.GenerateWeights())
-
-
             #Add the individual to the list of total population 
             self.population.append(temp)
 
@@ -86,6 +95,12 @@ class GA:
     # Evaluate the fitness of an individual
     ########################################
     def fitness(self, individual) -> float:
+        fit = list() 
+        #Fitness Function will be Mean Absolute Error
+        for i in self.population:  
+            fitscore = self.nn.fitness(i.getChromie()) 
+            fit.append(fitscore)
+        
         # this applies the individual's weights to the NN, feeds data set through and returns error of forward pass
         # TODO: figure out if we pass through entire dataset, or batch, etc. 
         pass
