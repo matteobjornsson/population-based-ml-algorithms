@@ -53,6 +53,7 @@ class GA:
         #Take in a neural Network 
         self.nn = NN 
         self.fit = list() 
+        self.globalfit = list() 
         #init general population 
         #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
@@ -105,12 +106,9 @@ class GA:
     # pick a subset of POP based on fitness OR some sort of random or ranked selection
     #####################################
     def selection(self):
-        #TODO: what does this function return? Does it modify population in place? does it return a subselection of pop? 
-        # is that subselection a list of individuals or just like array indices?
+ 
 
-        # TODO: pick the selection mechanism
-            # proportionate, rank, or tournament
-            # use rank? would work well with a max priority queue/heap
+ ######################################### Change to be probablistic Chance #############################################
         newPopulation = list()
         newFitness = list()  
         Subset = 0 
@@ -130,6 +128,7 @@ class GA:
             self.population.remove(self.population[mins])
         self.population = newPopulation
         self.fit = newFitness
+        self.globalfit.append(newFitness[0])
 
     ####################################
     # make new generation based on parent selection by swapping chromosomes 
@@ -137,12 +136,16 @@ class GA:
     def crossover(self, set_of_all_selected_parents): 
         self.generation = self.generation + 1
         NewPop = list()
+        i = 0 
+        j = 1
         #TODO: pick crossover mechanism (uniform?)
-        for i in range(len(self.population)-1):
+        while(range(len(self.population)-1)):
+            if j > len(self.population) -1: 
+                break 
             NewChromoC1 = list()
             NewChromoC2 = list()  
             Parent1 = self.population[i]
-            Parent2 = self.population[i+1]
+            Parent2 = self.population[j]
             Child1 = self.individual()
             Child2 = self.individual()
             Child1.InitChromie(Parent1.getsize())
@@ -168,6 +171,8 @@ class GA:
             Child2.setChromie(NewChromoC2)
             NewPop.append(Child1)
             NewPop.append(Child2)
+            i = i + 2 
+            j = j + 2 
         self.population = NewPop
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
