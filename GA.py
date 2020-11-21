@@ -21,6 +21,7 @@ class individual:
         for i in range(len(self.chromosome)): 
             self.chromosome[i] = 0  
         self.chromosome = np.array(self.chromosome)
+        self.Size = Feature_Size
 
 
     def SetChromie(self,Chromos): 
@@ -40,13 +41,13 @@ class individual:
             print(i)
 
 class GA:
-    #hyperparameter?
-    pop_size = 10
-    population = list() #TODO: what data structure to use here?
-    genetation = 0
-    Chromosome_Size = 10 
-    # hyperparameter!
-    probability_of_crossover = .5 
+    # #hyperparameter?
+    # pop_size = 5
+    # population = list() #TODO: what data structure to use here?
+    # genetation = 0
+    # Chromosome_Size = 10 
+    # # hyperparameter!
+    # probability_of_crossover = .5 
 
     #####################
     # Initialize the population etc
@@ -62,10 +63,11 @@ class GA:
         self.nn = NN 
         self.fit = list() 
         self.globalfit = list() 
-        self.pop_size = 10 
+        self.pop_size = 6
         #init general population 
         #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
+        self.population = list()
         for i in range(self.pop_size): 
             #Create a new individual object 
             temp = individual()
@@ -101,7 +103,8 @@ class GA:
         self.fit = list() 
         #Fitness Function will be Mean squared Error
         for i in self.population:  
-            print(len(i.getChromie()))
+            ch = i.getChromie()
+            z = 1
             fitscore = self.nn.fitness(i.getChromie()) 
             self.fit.append(fitscore)
 
@@ -110,29 +113,32 @@ class GA:
     #####################################
     def selection(self):
 
- ######################################### Change to be probablistic Chance #############################################
+    ######################################### Change to be probablistic Chance #############################################
         newPopulation = list()
         newFitness = list()  
         Subset = 0 
         Subset = int(self.pop_size / 2 )
         Subset = Subset + 1 
         for j in range(Subset): 
+            
             mins = self.min()
             newFitness.append(self.fit[mins])
             self.fit.remove(self.fit[mins])
+            fit = self.fit
             newPopulation.append(self.population[mins])
             self.population.remove(self.population[mins])
+            pop = self.population
         self.population = newPopulation
         self.fit = newFitness
         self.globalfit.append(newFitness[0])
    
  
     def min(self): 
-        mins = self.fit[0] 
+        mins = 0
         for i in range(len(self.fit)): 
-            if mins > self.fit[i]: 
+            if self.fit[mins] > self.fit[i]: 
                 mins = i 
-        return i 
+        return mins 
 
 
     ####################################
@@ -182,7 +188,12 @@ class GA:
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
             self.population.remove(self.population[Kill])
+        pop = self.population
         self.mutate()
+        pop2 = self.population
+        z = 1
+
+
 
     ###################################
     # introduce random change to each individual in the generation
@@ -190,7 +201,7 @@ class GA:
     def mutate(self):
         for i in self.population: 
             perc = random.randint(0,99) + 1 
-            if perc < 85: 
+            if perc < 97: 
                 continue 
             else: 
                 Mutation = self.GenerateWeights()
@@ -413,7 +424,9 @@ if __name__ == '__main__':
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
                 pso = GA(layers,layers, total_weights, nn)
-                for gen in range(10): 
+                plt.ion
+                for gen in range(100): 
+                    print('**** gen ', gen, '*****')
                     print("BEFORE FITNESS")
                     print(len(pso.population))
                     pso.fitness()
@@ -426,26 +439,23 @@ if __name__ == '__main__':
                     print("AFTER CROSS OVER")
                     print(len(pso.population))
                     
-                # plt.ion
-                #for epoch in range(pso.max_t):
-                ##    pso.update_fitness()
-                 #   pso.update_position_and_velocity()
-                    # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                    # plt.draw()
-                    # plt.pause(0.00001)
-                    # plt.clf()
+
+                    plt.plot(list(range(len(pso.globalfit))), pso.globalfit)
+                    plt.draw()
+                    plt.pause(0.00001)
+                    plt.clf()
                 ################################# new code for PSO end ###################################
-                # plt.ioff()
-                # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                plt.ioff()
+                plt.plot(list(range(len(pso.globalfit))), pso.globalfit)
+                plt.show()
                 # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
                 # plt.savefig('tuning_plots/' + img_name)
                 # plt.clf()
-
-                Estimation_Values = pso.NN.classify(test_data,test_labels)
+                Estimation_Values = pso.nn.classify(test_data,test_labels)
                 if regression == False: 
                     #Decode the One Hot encoding Value 
-                    Estimation_Values = pso.NN.PickLargest(Estimation_Values)
-                    test_labels_list = pso.NN.PickLargest(test_labels)
+                    Estimation_Values = pso.nn.PickLargest(Estimation_Values)
+                    test_labels_list = pso.nn.PickLargest(test_labels)
                     # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
                     # print(Estimation_Values)
                 else: 
