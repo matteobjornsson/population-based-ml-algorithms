@@ -58,6 +58,7 @@ class GA:
     #
     def __init__(self, layers: list, LayerCount,Total_Weight,NN):
         self.generation = 0 
+        self.maxGen = 100
         self.layer_node_count = LayerCount
         self.layers = layers
         #SEt the size to be the number of features 
@@ -65,7 +66,7 @@ class GA:
         #Take in a neural Network 
         self.nn = NN 
         self.globalfit = list() 
-        self.pop_size = 6
+        self.pop_size = 100
         #init general population 
         #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
@@ -84,6 +85,7 @@ class GA:
 
             # random weight values, weight matrix is numpy array, matches network architecture
             # use similar weight init function as from NN
+        self.bestChromie = self.population[0]
 
 
     #Generating the initial weights 
@@ -115,32 +117,27 @@ class GA:
     #####################################
     def selection(self):
 
-    ######################################### Change to be probablistic Chance #############################################
+        self.population = sorted(self.population, key=lambda individual: individual.fitness)
+        bestChromie = self.population[0]
+        self.globalfit.append(bestChromie.fitness)
+        if bestChromie.fitness < self.bestChromie.fitness:
+            self.bestChromie = bestChromie
+        pop = self.pop_size
+        ######################################### Change to be probablistic Chance #############################################
         newPopulation = list()
-        newFitness = list()  
         Subset = 0 
-        Subset = int(self.pop_size / 2 )
+        Subset = int(pop / 2 )
         Subset = Subset + 1 
         for j in range(Subset): 
-            
-            mins = self.min()
-            newFitness.append(self.fit[mins])
-            self.fit.remove(self.fit[mins])
-            fit = self.fit
-            newPopulation.append(self.population[mins])
-            self.population.remove(self.population[mins])
-            pop = self.population
+            choice = random.random()
+            sum = 0
+            for i in range(pop):
+                sum += 2/pop * (pop - (i+1))/(pop - 1)
+                if sum > choice:
+                    newPopulation.append(self.population[i])
+                    break
+
         self.population = newPopulation
-        self.fit = newFitness
-        self.globalfit.append(newFitness[0])
-   
- 
-    def min(self): 
-        mins = 0
-        for i in range(len(self.fit)): 
-            if self.fit[mins] > self.fit[i]: 
-                mins = i 
-        return mins 
 
 
     ####################################
@@ -375,6 +372,8 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
+        if data_set != "soybean": continue
+
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
@@ -432,7 +431,7 @@ if __name__ == '__main__':
                     total_weights += layers[i] * layers[i+1]
                 pso = GA(layers,layers, total_weights, nn)
                 plt.ion
-                for gen in range(100): 
+                for gen in range(pso.maxGen): 
                     print('**** gen ', gen, '*****')
                     print("BEFORE FITNESS")
                     print(len(pso.population))
@@ -451,10 +450,16 @@ if __name__ == '__main__':
                     plt.draw()
                     plt.pause(0.00001)
                     plt.clf()
+
+                # grab the best solution and set the NN weights
+                bestSolution = pso.bestChromie.getChromie()
+                bestWeights = pso.nn.weight_transform(bestSolution)
+                pso.nn.weights = bestWeights
+
                 ################################# new code for PSO end ###################################
-                plt.ioff()
-                plt.plot(list(range(len(pso.globalfit))), pso.globalfit)
-                plt.show()
+                # plt.ioff()
+                # plt.plot(list(range(len(pso.globalfit))), pso.globalfit)
+                # plt.show()
                 # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
                 # plt.savefig('tuning_plots/' + img_name)
                 # plt.clf()

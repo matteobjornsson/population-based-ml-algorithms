@@ -298,6 +298,7 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
+        if data_set != "soybean": continue
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
@@ -343,7 +344,7 @@ if __name__ == '__main__':
                     "c1": tuned_parameters[z]["c1"],
                     "c2": tuned_parameters[z]["c2"],
                     "vmax": 1,
-                    "pop_size": 1000                                                
+                    "pop_size": 100                                                
                     }
                 if data_set == "soybean": hyperparameters["vmax"] = 7
 
@@ -362,6 +363,10 @@ if __name__ == '__main__':
                     plt.draw()
                     plt.pause(0.00001)
                     plt.clf()
+                # get best overall solution and set the NN weights
+                bestSolution = pso.gbest_position
+                bestWeights = pso.NN.weight_transform(bestSolution)
+                pso.NN.weights = bestWeights
                 ################################# new code for PSO end ###################################
                 # plt.ioff()
                 # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)

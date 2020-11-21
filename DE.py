@@ -48,6 +48,7 @@ class DE:
         self.nn = nn 
         self.maxgens = 10
         self.globalbest = list() 
+        self.bestChromie = self.population[0]
 
     ########################################
     # Evaluate the fitness of an individual
@@ -96,6 +97,8 @@ class DE:
                 organism.setchromie(temp)
             if fitness < bestfit: 
                 bestfit = fitness
+            if fitness < self.bestChromie.fitness:
+                self.bestChromie = organism
             
             self.population[i] = organism
         self.globalbest.append(bestfit)
@@ -322,6 +325,10 @@ if __name__ == '__main__':
                     plt.draw()
                     plt.pause(0.00001)
                     plt.clf()
+                # get the best overall solution and set the NN to those weights
+                bestSolution = pso.bestChromie.getchromie()
+                bestWeights = pso.nn.weight_transform(bestSolution)
+                pso.nn.weights = bestWeights
                 ################################# new code for PSO end ###################################
                 # plt.ioff()
                 # plt.plot(list(range(len(pso.globalbest))), pso.globalbest)

@@ -270,6 +270,11 @@ class NeuralNetwork:
 
     ####################### FITNESS ############################################
     def fitness(self, position: np.ndarray) -> float:
+        weights = self.weight_transform(position)
+        self.weights = weights
+        return self.forward_pass()
+ 
+    def weight_transform(self, position) -> list:
         layers = [self.input_size] + self.hidden_layers + [self.output_size]
         weights = [None] * len(layers)
         weights[0] = []
@@ -280,9 +285,7 @@ class NeuralNetwork:
             w = position[:l]
             position = position[l:]
             weights[i+1] = w.reshape(layers[i+1], layers[i])
-        self.weights = weights
-        return self.forward_pass()
- 
+        return weights
 
 
 if __name__ == '__main__':
