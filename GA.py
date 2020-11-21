@@ -96,7 +96,7 @@ class GA:
     ########################################
     # Evaluate the fitness of an individual
     ########################################
-    def fitness(self, individual) -> float:
+    def fitness(self,) -> float:
         #Fitness Function will be Mean squared Error
         for i in self.population:  
             fitscore = self.nn.fitness(i.getChromie()) 
@@ -106,7 +106,6 @@ class GA:
     # pick a subset of POP based on fitness OR some sort of random or ranked selection
     #####################################
     def selection(self):
- 
 
  ######################################### Change to be probablistic Chance #############################################
         newPopulation = list()
@@ -133,7 +132,7 @@ class GA:
     ####################################
     # make new generation based on parent selection by swapping chromosomes 
     ####################################
-    def crossover(self, set_of_all_selected_parents): 
+    def crossover(self): 
         self.generation = self.generation + 1
         NewPop = list()
         i = 0 
@@ -182,7 +181,7 @@ class GA:
     ###################################
     # introduce random change to each individual in the generation
     ###############################
-    def mutate(self, new_generation):
+    def mutate(self):
         for i in self.population: 
             perc = random.randint(0,99) + 1 
             if perc < 85: 
