@@ -26,32 +26,28 @@ class individual():
         return self.fitness
     def setfit(fitt): 
         self.fitness = fitt
-                
+
 class DE:
-    #hyperparameter?
-    pop_size = 10
-    population = [] #TODO: what data structure to use here?
-    genetation = 0
-    # hyperparameter!
-    probability_of_crossover = .5 
-    #hyperparameter
-    beta = .2 #this is the hyperparameter from mutation
+    #this is the hyperparameter from mutation
 
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list):
-        #init general population 
-            # random weight values, weight matrix is numpy array, matches network architecture
-            # use similar weight init function as from NN
+    def __init__(self, layers: list,Chromie_Size,nn):
+         #hyperparameter?
+        self.pop_size = 10
+        self.population = list() #TODO: what data structure to use here?
+        for i in range(self.pop_size): 
+            temp = individual(Chromie_Size)
+            self.population.append(temp)
+        self.generation = 0
+        # hyperparameter!
+        self.probability_of_crossover = .5 
+        #hyperparameter
+        self.beta = .2
+        self.nn = nn 
+        self.maxgens = 1000 
         
-
-
-
-
-        #TODO: figure out if we should init a NN here or pass in, etc. What layer does this file represent
-        
-        pass
 
     ########################################
     # Evaluate the fitness of an individual
