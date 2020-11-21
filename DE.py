@@ -19,6 +19,7 @@ class DE:
             # use similar weight init function as from NN
 
         #TODO: figure out if we should init a NN here or pass in, etc. What layer does this file represent
+        
         pass
 
     ########################################

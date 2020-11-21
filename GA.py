@@ -96,7 +96,7 @@ class GA:
     # Evaluate the fitness of an individual
     ########################################
     def fitness(self, individual) -> float:
-        #Fitness Function will be Mean Absolute Error
+        #Fitness Function will be Mean squared Error
         for i in self.population:  
             fitscore = self.nn.fitness(i.getChromie()) 
             self.fit.append(fitscore)
@@ -138,7 +138,7 @@ class GA:
         self.generation = self.generation + 1
         NewPop = list()
         #TODO: pick crossover mechanism (uniform?)
-        for i in range(len(self.population))-1: 
+        for i in range(len(self.population)-1):
             NewChromoC1 = list()
             NewChromoC2 = list()  
             Parent1 = self.population[i]
