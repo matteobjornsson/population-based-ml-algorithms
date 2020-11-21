@@ -28,7 +28,7 @@ class individual:
     def SetSize(self,si): 
         self.Size = si 
     def getsize(self): 
-        return self.size
+        return self.Size
     def getChromie(self): 
         return self.chromosome 
 
@@ -53,7 +53,7 @@ class GA:
     ####################
     #
     def __init__(self, layers: list, LayerCount,Total_Weight,NN):
-
+        self.generation = 0 
         self.layer_node_count = LayerCount
         self.layers = layers
         #SEt the size to be the number of features 
@@ -98,9 +98,10 @@ class GA:
     # Evaluate the fitness of an individual
     ########################################
     def fitness(self,) -> float:
+        self.fit = list() 
         #Fitness Function will be Mean squared Error
         for i in self.population:  
-            print(i.getChromie())
+            print(len(i.getChromie()))
             fitscore = self.nn.fitness(i.getChromie()) 
             self.fit.append(fitscore)
 
@@ -113,16 +114,10 @@ class GA:
         newPopulation = list()
         newFitness = list()  
         Subset = 0 
-        Subset = self.pop_size / 2 
-        if Subset % 2 == 1: 
-            Subset = Subset + 1 
-        for i in range(Subset): 
-            mins = 0
-            #Find the minimum subset times 
-            for i in range(len(self.fit)):
-                if self.fit[mins] < self.fit[i]: 
-                    mins = i 
-                continue 
+        Subset = int(self.pop_size / 2 )
+        Subset = Subset + 1 
+        for j in range(Subset): 
+            mins = self.min()
             newFitness.append(self.fit[mins])
             self.fit.remove(self.fit[mins])
             newPopulation.append(self.population[mins])
@@ -130,53 +125,60 @@ class GA:
         self.population = newPopulation
         self.fit = newFitness
         self.globalfit.append(newFitness[0])
+   
+ 
+    def min(self): 
+        mins = self.fit[0] 
+        for i in range(len(self.fit)): 
+            if mins > self.fit[i]: 
+                mins = i 
+        return i 
+
 
     ####################################
     # make new generation based on parent selection by swapping chromosomes 
     ####################################
     def crossover(self): 
         self.generation = self.generation + 1
-        NewPop = list()
-        i = 0 
-        j = 1
+        NewPop = list() 
+        #{01 12 23 34 }
         #TODO: pick crossover mechanism (uniform?)
-        while(range(len(self.population)-1)):
-            if j > len(self.population) -1: 
-                break 
+        for i in range(len(self.population)-1): 
+
             NewChromoC1 = list()
             NewChromoC2 = list()  
+
             Parent1 = self.population[i]
-            Parent2 = self.population[j]
+            Parent2 = self.population[i+1]
+            
             Child1 = individual()
             Child2 = individual()
+            
             Child1.InitChromie(Parent1.getsize())
             Child2.InitChromie(Parent2.getsize())
+            
             for i in range(Parent1.getsize()):
                 score = random.randint(0,99) + 1
                 if score > 50: 
                     bit = Parent1.getChromie()
                     bit = bit[i]
+                    bit2 = Parent2.getChromie()
+                    bit2 = bit2[i]
                 else: 
                     bit = Parent2.getChromie()
                     bit = bit[i]
+                    bit2 = Parent1.getChromie()
+                    bit2 = bit2[i]
                 NewChromoC1.append(bit)
-                score = random.randint(0,99) + 1
-                if score > 50: 
-                    bit = Parent1.getChromie()
-                    bit = bit[i]
-                else: 
-                    bit = Parent2.getChromie()
-                    bit = bit[i]
-                NewChromoC2.append(bit)
+                NewChromoC2.append(bit2)
             NewChromoC1 = np.array(NewChromoC1)
             NewChromoC2 = np.array(NewChromoC2)
-            Child1.setChromie(NewChromoC1)
-            Child2.setChromie(NewChromoC2)
+            Child1.SetChromie(NewChromoC1)
+            Child2.SetChromie(NewChromoC2)
             NewPop.append(Child1)
             NewPop.append(Child2)
-            i = i + 2 
-            j = j + 2 
         self.population = NewPop
+        
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
             self.population.remove(self.population[Kill])
@@ -191,8 +193,8 @@ class GA:
             if perc < 85: 
                 continue 
             else: 
-                Mutation = GenerateWeights()
-                i.setChromie(Mutation)  
+                Mutation = self.GenerateWeights()
+                i.SetChromie(Mutation)  
 
 ##################################
 # Main function down here? 
@@ -412,10 +414,18 @@ if __name__ == '__main__':
                     total_weights += layers[i] * layers[i+1]
                 pso = GA(layers,layers, total_weights, nn)
                 for gen in range(10): 
+                    print("BEFORE FITNESS")
+                    print(len(pso.population))
                     pso.fitness()
+                    print("AFTER FITNESS")
+                    print(len(pso.population))
                     pso.selection()
+                    print("AFTER SELECTIOn")
+                    print(len(pso.population))
                     pso.crossover()
-
+                    print("AFTER CROSS OVER")
+                    print(len(pso.population))
+                    
                 # plt.ion
                 #for epoch in range(pso.max_t):
                 ##    pso.update_fitness()
