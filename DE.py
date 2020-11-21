@@ -35,7 +35,7 @@ class DE:
     ####################
     def __init__(self, layers: list,Chromie_Size,nn):
          #hyperparameter?
-        self.pop_size = 10
+        self.pop_size = 200
         self.population = list() #TODO: what data structure to use here?
         for i in range(self.pop_size): 
             temp = individual(Chromie_Size)
@@ -46,7 +46,7 @@ class DE:
         #hyperparameter
         self.beta = .2
         self.nn = nn 
-        self.maxgens = 1000 
+        self.maxgens = 10
         self.globalbest = list() 
 
     ########################################
@@ -76,9 +76,14 @@ class DE:
             organ1 = self.population[nums[0]]
             organ2 = self.population[nums[1]]
             organ3 = self.population[nums[2]]
-            temp = organism.getchromie()
+            temp = copy.deepcopy(organism.getchromie())
             for j in range(len(organism.getchromie())): 
-                ColumnTV= organ1.getchromie()[j] + self.beta * ((organ2.getchromie()[j] * organ2.getchromie()[j]) - (organ3.getchromie()[j] * organ3.getchromie()[j]))      
+                x1 = organ1.getchromie()[j]
+                x2 = organ2.getchromie()[j]
+                x3 = organ3.getchromie()[j]
+
+                b = self.beta
+                ColumnTV =  x1 + b * (x2 - x3)      
                 coin = random.randint(0,99) + 1 
                 if coin > self.probability_of_crossover: 
                     temp[j] = ColumnTV
@@ -108,7 +113,7 @@ class DE:
 if __name__ == '__main__':
     print("Program Start")
     headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
-    filename = 'GA_experimental_results.csv'
+    filename = 'DE_experimental_results.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -309,7 +314,7 @@ if __name__ == '__main__':
                 
                 pso = DE(layers,total_weights, nn)
                 plt.ion
-                for gen in range(100): 
+                for gen in range(pso.maxgens): 
                     pso.mutate_and_crossover()
                     
 
@@ -318,9 +323,9 @@ if __name__ == '__main__':
                     plt.pause(0.00001)
                     plt.clf()
                 ################################# new code for PSO end ###################################
-                plt.ioff()
-                plt.plot(list(range(len(pso.globalbest))), pso.globalbest)
-                plt.show()
+                # plt.ioff()
+                # plt.plot(list(range(len(pso.globalbest))), pso.globalbest)
+                # plt.show()
                 # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
                 # plt.savefig('tuning_plots/' + img_name)
                 # plt.clf()
