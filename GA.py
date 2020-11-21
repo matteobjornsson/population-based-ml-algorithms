@@ -15,25 +15,27 @@ class individual:
         self.Size = 0 
 
 
-    def InitChromie(Feature_Size):
+    def InitChromie(self,Feature_Size):
         #Loop through each index up until the number of features and just set it to 0 
         self.chromosome = [Feature_Size]
-        for i in range(Feature_Size): 
+        for i in range(len(self.chromosome)): 
             self.chromosome[i] = 0  
+        self.chromosome = np.array(self.chromosome)
 
-    def SetChromie(Chromos): 
+
+    def SetChromie(self,Chromos): 
         self.chromosome = Chromos
-    def SetSize(si): 
+    def SetSize(self,si): 
         self.Size = si 
-    def getsize(): 
+    def getsize(self): 
         return self.size
-    def getChromie(): 
+    def getChromie(self): 
         return self.chromosome 
 
-    def ReturnChromie():
+    def ReturnChromie(self):
         return self.chromosome
 
-    def printChromie(): 
+    def printChromie(self): 
         for i in self.chromosome: 
             print(i)
 
@@ -49,11 +51,13 @@ class GA:
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list, LayerCount,Feature_Size,NN):
+    #
+    def __init__(self, layers: list, LayerCount,Total_Weight,NN):
 
-        self.Layer_Node_Count = LayerCount
+        self.layer_node_count = LayerCount
+        self.layers = layers
         #SEt the size to be the number of features 
-        self.Chromosome_Size = Feature_Size 
+        self.Chromosome_Size = Total_Weight
         #Take in a neural Network 
         self.nn = NN 
         self.fit = list() 
@@ -66,11 +70,11 @@ class GA:
             #Create a new individual object 
             temp = individual()
             #Set the array size 
-            temp.SetSize(Feature_Size)
+            temp.SetSize(Total_Weight)
             #Initialize an empty list of weights 0s
-            temp.InitChromie(Chromosome_Size)
+            temp.InitChromie(Total_Weight)
             #Now randomly generate values to start for each of these sizes 
-            temp.setChromie(self.GenerateWeights())
+            temp.SetChromie(self.GenerateWeights())
             #Add the individual to the list of total population 
             self.population.append(temp)
 
@@ -79,13 +83,13 @@ class GA:
 
 
     #Generating the initial weights 
-    def GenerateWeights(): 
+    def GenerateWeights(self): 
         # initialize weights randomly, close to 0
         # generate the matrices that hold the input weights for each layer. Maybe return a list of matrices?
         # will need 1 weight matrix for 0 hidden layers, 2 for 1 hidden layer, 3 for 2 hidden layer. 
         weights = []
         counts = self.layer_node_count
-        for i in range(self.layers):
+        for i in range(len(self.layer_node_count)):
             if i == 0:
                 weights.append([])
             else:
@@ -411,7 +415,7 @@ if __name__ == '__main__':
                 total_weights = 0 
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
-                pso = GA(layers,total_weights, total_weights, nn)
+                pso = GA(layers,layers, total_weights, nn)
                 for gen in range(10): 
                     pso.fitness()
                     pso.selection()
