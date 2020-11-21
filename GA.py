@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 class individual:
     
     def __init__(self):
-        self.fitness = 10
+        self.fitness = float('inf')
         #How big should each chromosome be? My initial assumption is the number of feature vectors across the board 
         self.chromosome = [] # some numpy == weights
         self.Size = 0 
@@ -64,7 +64,6 @@ class GA:
         self.Chromosome_Size = Total_Weight
         #Take in a neural Network 
         self.nn = NN 
-        self.fit = list() 
         self.globalfit = list() 
         self.pop_size = 6
         #init general population 
@@ -103,13 +102,13 @@ class GA:
     # Evaluate the fitness of an individual
     ########################################
     def fitness(self,) -> float:
-        self.fit = list() 
         #Fitness Function will be Mean squared Error
         for i in self.population:  
             ch = i.getChromie()
             z = 1
             fitscore = self.nn.fitness(i.getChromie()) 
-            self.fit.append(fitscore)
+            i.setfit(fitscore)
+            
 
     ##################################
     # pick a subset of POP based on fitness OR some sort of random or ranked selection
