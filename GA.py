@@ -150,8 +150,8 @@ class GA:
             NewChromoC2 = list()  
             Parent1 = self.population[i]
             Parent2 = self.population[j]
-            Child1 = self.individual()
-            Child2 = self.individual()
+            Child1 = individual()
+            Child2 = individual()
             Child1.InitChromie(Parent1.getsize())
             Child2.InitChromie(Parent2.getsize())
             for i in range(Parent1.getsize()):
