@@ -23,7 +23,10 @@ class individual:
         self.chromosome = np.array(self.chromosome)
         self.Size = Feature_Size
 
-
+    def setfit(self,fit): 
+        self.fitness = fit 
+    def getfit(self): 
+        return self.fitness 
     def SetChromie(self,Chromos): 
         self.chromosome = Chromos
     def SetSize(self,si): 
