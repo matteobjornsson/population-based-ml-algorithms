@@ -42,33 +42,58 @@ class DE:
             self.population.append(temp)
         self.generation = 0
         # hyperparameter!
-        self.probability_of_crossover = .5 
+        self.probability_of_crossover = 75
         #hyperparameter
         self.beta = .2
         self.nn = nn 
         self.maxgens = 1000 
-        
+        self.globalbest = list() 
 
     ########################################
     # Evaluate the fitness of an individual
     ########################################
-    def fitness(self, individual) -> float:
-        # this applies the individual's weights to the NN, feeds data set through and returns error of forward pass
-        # TODO: figure out if we pass through entire dataset, or batch, etc. 
-        pass
+    def fitness(self,chromie) -> float:
+        return self.nn.fitness(chromie)
+
 
     ###################################
     # grab 3 vectors from pop, without repalcement, generate trial vector
     ###############################
     def mutate_and_crossover(self):
-        #for each pop individual:
-            # select three vectors x1 x2 x3 from pop
-            # calculate trial vector uj = x1 + beta * (x2 - x3)
-            # generate new vector via crossover per feature in individual
-            # evaluate fitness of new vector
-                # keep the one with the better fitness
-            # TODO: do we edit each individual in place, from i=0 to len(pop)?
-        pass
+        bestfit = float('inf')
+        for i in range(len(self.population)):
+            nums = list()
+            nums.append(i)
+            count = 0 
+            while(count != 3): 
+                org = random.randint(0,len(self.population))
+                if org in nums: 
+                    continue 
+                nums.append(org)
+                count = count +1
+            organism = self.population[i]
+            nums.remove(i)
+            organ1 = self.population[nums[0]]
+            organ2 = self.population[nums[1]]
+            organ3 = self.population[nums[2]]
+            temp = organmism.getchromie()
+            for j in range(len(organism.getchromie())): 
+                ColumnTV= organ1.getchromie()[j] + self.beta * ((organ2.getchromie()[j] * organ2.getchromie()[j]) - (organ3.getchromie()[j] * organ3.getchromie()[j]))      
+                coin = random.randint(0,99) + 1 
+                if coin > self.probability_of_crossover: 
+                    temp[j] = ColumnTV
+                else: 
+                    #No crossover 
+                    continue 
+            fitness = self.fitness(temp)
+            if fitness < organmism.getfit(): 
+                organism.setfit(fitness)
+                organism.setchromie(temp)
+            if fitness < bestfit: 
+                bestfit = finess
+            
+            self.population[i] = organism
+        self.globalbest.append(bestfit)
 
     ##################################
     # Main function down here? 
