@@ -87,7 +87,9 @@ class GA:
         # initialize weights randomly, close to 0
         # generate the matrices that hold the input weights for each layer. Maybe return a list of matrices?
         # will need 1 weight matrix for 0 hidden layers, 2 for 1 hidden layer, 3 for 2 hidden layer. 
-        weights = np.random.randn(layer_nodes, layer_inputs) * 1/layer_inputs
+        layer_nodes = - 1
+        layer_inputs = 1 
+        weights = np.random.uniform(layer_nodes, layer_inputs,self.Chromosome_Size)
         return weights
 
 
