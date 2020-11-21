@@ -16,15 +16,15 @@ class individual():
             lowerbound = -10 
             upperbound = 10 
             for i in range(Size):
-                Chromie.append(random.uniform(lowerbound,upperbound))
+                self.Chromie.append(random.uniform(lowerbound,upperbound))
             self.Chromie = np.array(self.Chromie)
-    def getchromie(): 
+    def getchromie(self): 
         return self.Chromie
-    def setchromie(chrom):
+    def setchromie(self,chrom):
         self.Chromie = chrom 
-    def getfit(): 
+    def getfit(self): 
         return self.fitness
-    def setfit(fitt): 
+    def setfit(self,fitt): 
         self.fitness = fitt
 
 class DE:
@@ -65,8 +65,8 @@ class DE:
             nums = list()
             nums.append(i)
             count = 0 
-            while(count != 3): 
-                org = random.randint(0,len(self.population))
+            while(count < 4): 
+                org = random.randint(0,len(self.population)-1)
                 if org in nums: 
                     continue 
                 nums.append(org)
@@ -76,7 +76,7 @@ class DE:
             organ1 = self.population[nums[0]]
             organ2 = self.population[nums[1]]
             organ3 = self.population[nums[2]]
-            temp = organmism.getchromie()
+            temp = organism.getchromie()
             for j in range(len(organism.getchromie())): 
                 ColumnTV= organ1.getchromie()[j] + self.beta * ((organ2.getchromie()[j] * organ2.getchromie()[j]) - (organ3.getchromie()[j] * organ3.getchromie()[j]))      
                 coin = random.randint(0,99) + 1 
@@ -86,11 +86,11 @@ class DE:
                     #No crossover 
                     continue 
             fitness = self.fitness(temp)
-            if fitness < organmism.getfit(): 
+            if fitness < organism.getfit(): 
                 organism.setfit(fitness)
                 organism.setchromie(temp)
             if fitness < bestfit: 
-                bestfit = finess
+                bestfit = fitness
             
             self.population[i] = organism
         self.globalbest.append(bestfit)
@@ -99,7 +99,7 @@ class DE:
     # Main function down here? 
     # Remember, functions we can dispatch as jobs with unique parameters = parallelizeable. 
     #################################
-    def driver(input_parameters): 
+    def driver(self,input_parameters): 
         # Until convergence: 
             # for each individual:
                 # mutate and crossover to generate replacement 
