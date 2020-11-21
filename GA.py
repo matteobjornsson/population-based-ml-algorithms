@@ -199,13 +199,18 @@ class GA:
     # introduce random change to each individual in the generation
     ###############################
     def mutate(self):
-        for i in self.population: 
+        MutationRate = 70
+        Upperbound = 10 
+        lowerbound = -10 
+        for i in self.population:
             perc = random.randint(0,99) + 1 
-            if perc < 97: 
+            if perc < MutationRate: 
                 continue 
             else: 
-                Mutation = self.GenerateWeights()
-                i.SetChromie(Mutation)  
+                bit = random.randint(0,len(i.getChromie())-1)
+                temp = i.getChromie()
+                temp[bit] = random.uniform(lowerbound,Upperbound)
+                i.SetChromie(temp)  
 
 ##################################
 # Main function down here? 
