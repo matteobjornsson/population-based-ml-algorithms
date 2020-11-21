@@ -1,5 +1,32 @@
+import random
+import Performance
+from NeuralNetwork import NeuralNetwork
+import DataUtility
+import numpy as np
+import copy
+import matplotlib.pyplot as plt
 
 
+
+class individual(): 
+ 
+    def __init__(self, Size):
+            self.fitness = float('inf')
+            self.Chromie = list() 
+            lowerbound = -10 
+            upperbound = 10 
+            for i in range(Size):
+                Chromie.append(random.uniform(lowerbound,upperbound))
+            self.Chromie = np.array(self.Chromie)
+    def getchromie(): 
+        return self.Chromie
+    def setchromie(chrom):
+        self.Chromie = chrom 
+    def getfit(): 
+        return self.fitness
+    def setfit(fitt): 
+        self.fitness = fitt
+                
 class DE:
     #hyperparameter?
     pop_size = 10
@@ -17,6 +44,10 @@ class DE:
         #init general population 
             # random weight values, weight matrix is numpy array, matches network architecture
             # use similar weight init function as from NN
+        
+
+
+
 
         #TODO: figure out if we should init a NN here or pass in, etc. What layer does this file represent
         
