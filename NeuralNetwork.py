@@ -13,6 +13,7 @@ import DataUtility
 import pandas as pd
 import matplotlib.pyplot as plt
 import time 
+import copy
 
 class NeuralNetwork:
 
@@ -268,7 +269,17 @@ class NeuralNetwork:
         return Estimation
 
     ####################### FITNESS ############################################
-    def fitness(self, weights: list) -> float:
+    def fitness(self, position: np.ndarray) -> float:
+        layers = [self.input_size] + self.hidden_layers + [self.output_size]
+        weights = [None] * len(layers)
+        weights[0] = []
+        # transform the flat position vector into a list of weight matrices
+        # for the neural network
+        for i in range(len(layers)-1):
+            l = layers[i] * layers[i+1]
+            w = position[:l]
+            position = position[l:]
+            weights[i+1] = w.reshape(layers[i+1], layers[i])
         self.weights = weights
         return self.forward_pass()
  

@@ -82,18 +82,11 @@ class PSO:
         self.gbest_fitness = float('inf')
         self.gbest_position = None
         # number of iterations 
-        self.max_t = 1000
+        self.max_t = 10
 
 
         # fitness plotting:
         self.fitness_plot = []
-
-    def swarm_diversity(self) -> float:
-        pass
-
-    def swarm_fitness(self) -> float:
-        # plot this over time to determine convergence?
-        pass
 
     def update_position_and_velocity(self):
         # iterate over each particle
@@ -135,18 +128,8 @@ class PSO:
 
         layers = self.layers
         for p in self.population:
-            weights = [None] * len(layers)
-            weights[0] = []
-            position = copy.copy(p.position)
-            # transform the flat position vector into a list of weight matrices
-            # for the neural network
-            for i in range(len(layers)-1):
-                l = layers[i] * layers[i+1]
-                w = position[:l]
-                position = position[l:]
-                weights[i+1] = w.reshape(layers[i+1], layers[i])
             # run the dataset through the NN with the particle's weights to get fitness
-            fitness = self.NN.fitness(weights)
+            fitness = self.NN.fitness(p.position)
             # update personal best
             if p.pbest_fitness > fitness:
                 p.pbest_fitness = fitness
@@ -172,7 +155,7 @@ class PSO:
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
-    filename = 'PSO_experimental_results.csv'
+    filename = 'test.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -349,6 +332,7 @@ if __name__ == '__main__':
             data_set_size = X.shape[1] + test_data.shape[1]
 
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
+            
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
@@ -374,10 +358,10 @@ if __name__ == '__main__':
                 for epoch in range(pso.max_t):
                     pso.update_fitness()
                     pso.update_position_and_velocity()
-                    # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                    # plt.draw()
-                    # plt.pause(0.00001)
-                    # plt.clf()
+                    plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
+                    plt.draw()
+                    plt.pause(0.00001)
+                    plt.clf()
                 ################################# new code for PSO end ###################################
                 # plt.ioff()
                 # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
