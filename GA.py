@@ -87,17 +87,7 @@ class GA:
         # initialize weights randomly, close to 0
         # generate the matrices that hold the input weights for each layer. Maybe return a list of matrices?
         # will need 1 weight matrix for 0 hidden layers, 2 for 1 hidden layer, 3 for 2 hidden layer. 
-        weights = []
-        counts = self.layer_node_count
-        for i in range(len(self.layer_node_count)):
-            if i == 0:
-                weights.append([])
-            else:
-                # initialze a (notes, inputs) dimension matrix for each layer. 
-                # layer designated by order of append (position in weights list)
-                layer_nodes = counts[i]
-                layer_inputs = counts[i-1]
-                weights.append(np.random.randn(layer_nodes, layer_inputs) * 1/layer_inputs) # or * 0.01
+        weights = np.random.randn(layer_nodes, layer_inputs) * 1/layer_inputs
         return weights
 
 
@@ -108,6 +98,7 @@ class GA:
     def fitness(self,) -> float:
         #Fitness Function will be Mean squared Error
         for i in self.population:  
+            print(i.getChromie())
             fitscore = self.nn.fitness(i.getChromie()) 
             self.fit.append(fitscore)
 
@@ -175,6 +166,8 @@ class GA:
                     bit = Parent2.getChromie()
                     bit = bit[i]
                 NewChromoC2.append(bit)
+            NewChromoC1 = np.array(NewChromoC1)
+            NewChromoC2 = np.array(NewChromoC2)
             Child1.setChromie(NewChromoC1)
             Child2.setChromie(NewChromoC2)
             NewPop.append(Child1)
