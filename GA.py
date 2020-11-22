@@ -56,17 +56,20 @@ class GA:
     # Initialize the population etc
     ####################
     #
-    def __init__(self, layers: list, LayerCount,Total_Weight,NN):
+    def __init__(self, hyperparameters:dict , Total_Weight:int ,NN):
+        
+        self.maxGen = hyperparameters["maxGen"]
+        self.pop_size = hyperparameters["pop_size"]
+        self.mutation_rate = hyperparameters["mutation_rate"]
+        self.mutation_range = hyperparameters["mutation_range"]
+        self.crossover_rate = hyperparameters["crossover_rate"]
         self.generation = 0 
-        self.maxGen = 100
-        self.layer_node_count = LayerCount
-        self.layers = layers
         #SEt the size to be the number of features 
         self.Chromosome_Size = Total_Weight
         #Take in a neural Network 
         self.nn = NN 
         self.globalfit = list() 
-        self.pop_size = 100
+        
         #init general population 
         #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
@@ -106,8 +109,6 @@ class GA:
     def fitness(self,) -> float:
         #Fitness Function will be Mean squared Error
         for i in self.population:  
-            ch = i.getChromie()
-            z = 1
             fitscore = self.nn.fitness(i.getChromie()) 
             i.setfit(fitscore)
             
@@ -123,9 +124,9 @@ class GA:
         if bestChromie.fitness < self.bestChromie.fitness:
             self.bestChromie = bestChromie
         pop = self.pop_size
-        ######################################### Change to be probablistic Chance #############################################
+
+        #  RANKED ROULETTE SELECTION
         newPopulation = list()
-        Subset = 0 
         Subset = int(pop / 2 )
         Subset = Subset + 1 
         for j in range(Subset): 
@@ -163,8 +164,8 @@ class GA:
             Child2.InitChromie(Parent2.getsize())
             
             for i in range(Parent1.getsize()):
-                score = random.randint(0,99) + 1
-                if score > 50: 
+                score = random.random()
+                if score > self.crossover_rate: 
                     bit = Parent1.getChromie()
                     bit = bit[i]
                     bit2 = Parent2.getChromie()
@@ -187,28 +188,20 @@ class GA:
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
             self.population.remove(self.population[Kill])
-        pop = self.population
         self.mutate()
-        pop2 = self.population
-        z = 1
-
-
 
     ###################################
     # introduce random change to each individual in the generation
     ###############################
     def mutate(self):
-        MutationRate = 70
-        Upperbound = 10 
-        lowerbound = -10 
         for i in self.population:
-            perc = random.randint(0,99) + 1 
-            if perc < MutationRate: 
+            perc = random.random()
+            if perc > self.mutation_rate: 
                 continue 
             else: 
                 bit = random.randint(0,len(i.getChromie())-1)
                 temp = i.getChromie()
-                temp[bit] = random.uniform(lowerbound,Upperbound)
+                temp[bit] = random.uniform(-self.mutation_range,self.mutation_range)
                 i.SetChromie(temp)  
 
 ##################################
@@ -227,8 +220,8 @@ class GA:
 
 
 if __name__ == '__main__':
-    print("Program Start")
-    headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
+    print("Program Start")                
+    headers = ["Data set", "layers", "maxGen", "pop_size", "mutation_rate", "mutation_range", "crossover_rate", "loss1", "loss2"]
     filename = 'GA_experimental_results.csv'
 
     Per = Performance.Results()
@@ -372,7 +365,6 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-        if data_set != "soybean": continue
 
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
@@ -412,15 +404,12 @@ if __name__ == '__main__':
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
                 hyperparameters = {
-                    "position_range": 10,
-                    "velocity_range": 1,
-                    "omega": tuned_parameters[z]["omega"],
-                    "c1": tuned_parameters[z]["c1"],
-                    "c2": tuned_parameters[z]["c2"],
-                    "vmax": 1,
-                    "pop_size": 1000                                                
+                    "maxGen":100,
+                    "pop_size":100,
+                    "mutation_rate": .5,
+                    "mutation_range": 10,
+                    "crossover_rate": .5
                     }
-                if data_set == "soybean": hyperparameters["vmax"] = 7
 
                 layers = [input_size] + hidden_layers + [output_size]
 
@@ -429,7 +418,9 @@ if __name__ == '__main__':
                 total_weights = 0 
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
-                ga = GA(layers,layers, total_weights, nn)
+
+                ga = GA(hyperparameters, total_weights, nn)
+
                 plt.ion
                 for gen in range(ga.maxGen): 
                     ga.fitness()
@@ -474,15 +465,15 @@ if __name__ == '__main__':
                 # print(Nice)
             
 
-                # headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size"]
+                # headers = ["Data set", "layers", "maxGen", "pop_size", "mutation_rate", "mutation_range", "crossover_rate", "loss1", "loss2"]
                 Meta = [
                     data_set, 
                     len(hidden_layers), 
-                    hyperparameters["omega"], 
-                    hyperparameters["c1"], 
-                    hyperparameters["c2"],
-                    hyperparameters["vmax"],
-                    1000 # pop size
+                    hyperparameters["maxGen"], 
+                    hyperparameters["pop_size"], 
+                    hyperparameters["mutation_rate"],
+                    hyperparameters["mutation_range"],
+                    hyperparameters["crossover_rate"]
                     ]
                 Per.StartLossFunction(regression, Nice, Meta, filename)
                 print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
