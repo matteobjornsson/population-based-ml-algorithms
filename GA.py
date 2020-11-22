@@ -222,7 +222,7 @@ class GA:
 if __name__ == '__main__':
     print("Program Start")                
     headers = ["Data set", "layers", "maxGen", "pop_size", "mutation_rate", "mutation_range", "crossover_rate", "loss1", "loss2"]
-    filename = 'GA_experimental_results.csv'
+    filename = 'GA_tuning_results.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -363,15 +363,15 @@ if __name__ == '__main__':
         }
     }
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
-    total_counter = 0
+    total_counter = 1
     for data_set in data_sets:
 
-        data_set_counter = 0
+        data_set_counter = 1
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(10):
+        for j in range(5):
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -404,9 +404,11 @@ if __name__ == '__main__':
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
                 maxgen = [250,500,1000]
                 pops = [500,1000,2000] 
-                mr = [.5,.6,.4]
-                mra = [10,20,15]
-                crosss = [.5,.6]
+                mr = [.2,.5,.8]
+                mra = [10]
+                crosss = [.2,.5]
+                
+                total_trials = 4860
                 for a in maxgen:
                     for b in pops:
                         for c in mr:
@@ -439,7 +441,7 @@ if __name__ == '__main__':
 
                                         ga = GA(hyperparameters, total_weights, nn)
 
-                                        plt.ion
+                                        # plt.ion
                                         for gen in range(ga.maxGen): 
                                             ga.fitness()
                                             ga.selection()
@@ -494,7 +496,8 @@ if __name__ == '__main__':
                                             hyperparameters["crossover_rate"]
                                             ]
                                         Per.StartLossFunction(regression, Nice, Meta, filename)
-                                        print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
+
+                                        print(f"{data_set_counter}/{int(total_trials)/6} {data_set}. {total_counter}/{total_trials} total")
                                         data_set_counter += 1
                                         total_counter += 1
 
