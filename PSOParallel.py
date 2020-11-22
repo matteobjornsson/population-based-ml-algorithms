@@ -410,18 +410,18 @@ if __name__ == '__main__':
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(3):
+        for j in range(5):
             data_package = generate_data_package(fold=j, tenfolds=tenfold_data_and_labels, regression=regression, du=du)
 
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
-                omega = [.2, .5, .8]
-                c1 = [.1, .5, .9, 5]
-                c2 = [.1, .5, .9, 5]
+                omega = [.1, .4]
+                c1 = [.1, .5, .9, 3]
+                c2 = [.1, .5, .9, 3]
                 vmax = [1]
-                pop_size = [1000, 10000]
-                max_iter = [100, 1000]
+                pop_size = [1000]
+                max_iter = [500]
                 for a in omega:
                     for b in c1:
                         for c in c2:
