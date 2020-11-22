@@ -461,7 +461,7 @@ if __name__ == '__main__':
                                             hyperparameters,
                                             data_set_counter,
                                             total_counter,
-                                            31104
+                                            2880
                                         ))
                                         data_set_counter += 1
                                         total_counter += 1
