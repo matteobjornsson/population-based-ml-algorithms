@@ -33,20 +33,20 @@ class DE:
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list,Chromie_Size,nn):
-         #hyperparameter?
-        self.pop_size = 200
+    def __init__(self, hyperparameters: dict ,Chromie_Size,nn):
+        #Hyperparameters v
+        self.beta = hyperparameters["beta"]
+        self.maxgens = hyperparameters["max_gen"]
+        self.pop_size = hyperparameters["population_size"]
+        self.probability_of_crossover = hyperparameters["crossover_rate"]
+        #Hyperparameters ^
+
         self.population = list() #TODO: what data structure to use here?
         for i in range(self.pop_size): 
             temp = individual(Chromie_Size)
             self.population.append(temp)
         self.generation = 0
-        # hyperparameter!
-        self.probability_of_crossover = 75
-        #hyperparameter
-        self.beta = .2
         self.nn = nn 
-        self.maxgens = 10
         self.globalbest = list() 
         self.bestChromie = self.population[0]
 
@@ -85,8 +85,8 @@ class DE:
 
                 b = self.beta
                 ColumnTV =  x1 + b * (x2 - x3)      
-                coin = random.randint(0,99) + 1 
-                if coin > self.probability_of_crossover: 
+                coin = random.random() 
+                if coin < self.probability_of_crossover: 
                     temp[j] = ColumnTV
                 else: 
                     #No crossover 
@@ -115,7 +115,7 @@ class DE:
         pass
 if __name__ == '__main__':
     print("Program Start")
-    headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
+    headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
     filename = 'DE_experimental_results.csv'
 
     Per = Performance.Results()
@@ -296,51 +296,47 @@ if __name__ == '__main__':
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
-                hyperparameters = {
-                    "position_range": 10,
-                    "velocity_range": 1,
-                    "omega": tuned_parameters[z]["omega"],
-                    "c1": tuned_parameters[z]["c1"],
-                    "c2": tuned_parameters[z]["c2"],
-                    "vmax": 1,
-                    "pop_size": 1000                                                
-                    }
-                if data_set == "soybean": hyperparameters["vmax"] = 7
-
                 layers = [input_size] + hidden_layers + [output_size]
 
                 nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
                 nn.set_input_data(X,labels)
+
                 total_weights = 0 
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
-                
-                pso = DE(layers,total_weights, nn)
+                print("number of weights to learn: ", total_weights)
+                hyperparameters = {
+                    "population_size": 10*total_weights,
+                    "beta": .5,
+                    "crossover_rate": .6, 
+                    "max_gen": 100                                              
+                    }
+                de = DE(hyperparameters,total_weights, nn)
                 plt.ion
-                for gen in range(pso.maxgens): 
-                    pso.mutate_and_crossover()
+                for gen in range(de.maxgens): 
+                    de.mutate_and_crossover()
                     
 
-                    plt.plot(list(range(len(pso.globalbest))), pso.globalbest)
+                    plt.plot(list(range(len(de.globalbest))), de.globalbest)
                     plt.draw()
                     plt.pause(0.00001)
                     plt.clf()
                 # get the best overall solution and set the NN to those weights
-                bestSolution = pso.bestChromie.getchromie()
-                bestWeights = pso.nn.weight_transform(bestSolution)
-                pso.nn.weights = bestWeights
-                ################################# new code for PSO end ###################################
+                bestSolution = de.bestChromie.getchromie()
+                bestWeights = de.nn.weight_transform(bestSolution)
+                de.nn.weights = bestWeights
+                ################################# new code for de end ###################################
                 # plt.ioff()
-                # plt.plot(list(range(len(pso.globalbest))), pso.globalbest)
+                # plt.plot(list(range(len(de.globalbest))), de.globalbest)
                 # plt.show()
                 # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
                 # plt.savefig('tuning_plots/' + img_name)
                 # plt.clf()
-                Estimation_Values = pso.nn.classify(test_data,test_labels)
+                Estimation_Values = de.nn.classify(test_data,test_labels)
                 if regression == False: 
                     #Decode the One Hot encoding Value 
-                    Estimation_Values = pso.nn.PickLargest(Estimation_Values)
-                    test_labels_list = pso.nn.PickLargest(test_labels)
+                    Estimation_Values = de.nn.PickLargest(Estimation_Values)
+                    test_labels_list = de.nn.PickLargest(test_labels)
                     # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
                     # print(Estimation_Values)
                 else: 
@@ -357,25 +353,19 @@ if __name__ == '__main__':
                 # print(Nice)
             
 
-                # headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size"]
+                # headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
                 Meta = [
                     data_set, 
                     len(hidden_layers), 
-                    hyperparameters["omega"], 
-                    hyperparameters["c1"], 
-                    hyperparameters["c2"],
-                    hyperparameters["vmax"],
-                    1000 # pop size
+                    hyperparameters["population_size"], 
+                    hyperparameters["beta"], 
+                    hyperparameters["crossover_rate"],
+                    hyperparameters["max_gen"]
                     ]
+
                 Per.StartLossFunction(regression, Nice, Meta, filename)
                 print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
                 data_set_counter += 1
                 total_counter += 1
-
-
-
-
-
-
 
     print("Program End ")
