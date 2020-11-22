@@ -427,10 +427,10 @@ if __name__ == '__main__':
                     ga.selection()
                     ga.crossover()
 
-                    plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
-                    plt.draw()
-                    plt.pause(0.00001)
-                    plt.clf()
+                    #plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
+                    ##plt.draw()
+                    ##plt.pause(0.00001)
+                    #plt.clf()
 
                 # grab the best solution and set the NN weights
                 bestSolution = ga.bestChromie.getChromie()
