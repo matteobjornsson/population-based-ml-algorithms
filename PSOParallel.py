@@ -410,62 +410,61 @@ if __name__ == '__main__':
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(10):
+        for j in range(3):
             data_package = generate_data_package(fold=j, tenfolds=tenfold_data_and_labels, regression=regression, du=du)
 
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
-                for repeat in range(3):
-                    omega = [.2, .5, .8]
-                    c1 = [.1, .5, .9, 5]
-                    c2 = [.1, .5, .9, 5]
-                    vmax = [1]
-                    pop_size = [1000, 10000]
-                    max_iter = [100, 1000]
-                    for a in omega:
-                        for b in c1:
-                            for c in c2:
-                                for d in vmax:
-                                    for e in pop_size:
-                                        for f in max_iter:
-                                            hyperparameters = {
-                                                "position_range": 10,
-                                                "velocity_range": 1,
-                                                "omega": a,
-                                                "c1": b,
-                                                "c2": c,
-                                                "vmax": d,
-                                                "pop_size": e,
-                                                "max_iter": f                                              
-                                                }
-                    # hyperparameters = {
-                    #     "position_range": 10,
-                    #     "velocity_range": 1,
-                    #     "omega": tuned_parameters[z]["omega"],
-                    #     "c1": tuned_parameters[z]["c1"],
-                    #     "c2": tuned_parameters[z]["c2"],
-                    #     "vmax": 1,
-                    #     "pop_size": 1000                                        
-                    #     }
-                    # if data_set == "soybean": hyperparameters["vmax"] = 7
+                omega = [.2, .5, .8]
+                c1 = [.1, .5, .9, 5]
+                c2 = [.1, .5, .9, 5]
+                vmax = [1]
+                pop_size = [1000, 10000]
+                max_iter = [100, 1000]
+                for a in omega:
+                    for b in c1:
+                        for c in c2:
+                            for d in vmax:
+                                for e in pop_size:
+                                    for f in max_iter:
+                                        hyperparameters = {
+                                            "position_range": 10,
+                                            "velocity_range": 1,
+                                            "omega": a,
+                                            "c1": b,
+                                            "c2": c,
+                                            "vmax": d,
+                                            "pop_size": e,
+                                            "max_iter": f                                              
+                                            }
+                # hyperparameters = {
+                #     "position_range": 10,
+                #     "velocity_range": 1,
+                #     "omega": tuned_parameters[z]["omega"],
+                #     "c1": tuned_parameters[z]["c1"],
+                #     "c2": tuned_parameters[z]["c2"],
+                #     "vmax": 1,
+                #     "pop_size": 1000                                        
+                #     }
+                # if data_set == "soybean": hyperparameters["vmax"] = 7
 
-                                            pool.apply_async(driver, args=(
-                                                q, # queue
-                                                hyperparameters["max_iter"], # max iter
-                                                data_set, 
-                                                data_package,
-                                                regression,
-                                                du,
-                                                Per,
-                                                hidden_layers,
-                                                hyperparameters,
-                                                data_set_counter,
-                                                total_counter,
-                                                103680
-                                            ))
-                                            data_set_counter += 1
-                                            total_counter += 1
+                                        pool.apply_async(driver, args=(
+                                            q, # queue
+                                            hyperparameters["max_iter"], # max iter
+                                            data_set, 
+                                            data_package,
+                                            regression,
+                                            du,
+                                            Per,
+                                            hidden_layers,
+                                            hyperparameters,
+                                            data_set_counter,
+                                            total_counter,
+                                            31104
+                                        ))
+                                        data_set_counter += 1
+                                        total_counter += 1
 
     ##############################
     # CLOSE THE MULTIPROCESS POOL
