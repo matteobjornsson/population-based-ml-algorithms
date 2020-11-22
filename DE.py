@@ -317,10 +317,10 @@ if __name__ == '__main__':
                     de.mutate_and_crossover()
                     
 
-                    plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                    plt.draw()
-                    plt.pause(0.00001)
-                    plt.clf()
+                   # plt.plot(list(range(len(de.globalbest))), de.globalbest)
+                   # plt.draw()
+                   # plt.pause(0.00001)
+                   # plt.clf()
                 # get the best overall solution and set the NN to those weights
                 bestSolution = de.bestChromie.getchromie()
                 bestWeights = de.nn.weight_transform(bestSolution)
