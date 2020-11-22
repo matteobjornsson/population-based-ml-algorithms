@@ -5,6 +5,7 @@ import DataUtility
 import numpy as np
 import copy
 import multiprocessing
+import traceback
 
 class Particle:
     '''
@@ -143,44 +144,56 @@ class PSO:
         # track global best over time each iteration
         self.fitness_plot.append(self.gbest_fitness)
 
-def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: DataUtility, perf: Performance, hidden_layers: list, hyper_params: dict, count: int, total: int):
-    # init all test data values
-    test_data, test_labels, training_data, training_labels, output_size, input_size = data_package
-    layers = [input_size] + hidden_layers + [output_size]
+def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: DataUtility, perf: Performance, hidden_layers: list, hyper_params: dict, count: int, total_counter:int, total: int):
+    try:
+        # init all test data values
+        test_data, test_labels, training_data, training_labels, output_size, input_size = data_package
+        layers = [input_size] + hidden_layers + [output_size]
 
-    # init neural network
-    nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
-    nn.set_input_data(training_data, training_labels)
+        # init neural network
+        nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
+        nn.set_input_data(training_data, training_labels)
 
-    # initi PSO and train it
-    pso = PSO(layers, hyper_params, nn, maxIter)
-    for epoch in range(pso.max_t):
-        pso.update_fitness()
-        pso.update_position_and_velocity()
-    
-    # get best overall solution and set the NN weights
-    bestSolution = pso.gbest_position
-    bestWeights = pso.NN.weight_transform(bestSolution)
-    pso.NN.weights = bestWeights
+        # initi PSO and train it
+        pso = PSO(layers, hyper_params, nn, maxIter)
+        for epoch in range(pso.max_t):
+            pso.update_fitness()
+            pso.update_position_and_velocity()
+        
+        # get best overall solution and set the NN weights
+        bestSolution = pso.gbest_position
+        bestWeights = pso.NN.weight_transform(bestSolution)
+        pso.NN.weights = bestWeights
 
-    # pass the test data through the trained NN
-    results = classify(test_data, test_labels, regression, pso, perf)
-    
-    Meta = [
-        ds, 
-        len(hidden_layers), 
-        hyper_params["omega"], 
-        hyper_params["c1"], 
-        hyper_params["c2"],
-        hyper_params["vmax"],
-        hyper_params["pop_size"]
-        ]
-    results_performance = perf.LossFunctionPerformance(regression, results) 
-    data_point = Meta + results_performance
-    data_point_string = ','.join([str(x) for x in data_point])
-    # put the result on the multiprocessing queue
-    q.put(data_point_string)
-    print(f"{ds} {count}/{total}")
+        # pass the test data through the trained NN
+        results = classify(test_data, test_labels, regression, pso, perf)
+
+        # headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "maxIter", "loss1", "loss2"]
+        Meta = [
+            ds, 
+            len(hidden_layers), 
+            hyper_params["omega"], 
+            hyper_params["c1"], 
+            hyper_params["c2"],
+            hyper_params["vmax"],
+            hyper_params["pop_size"],
+            hyper_params["max_iter"]
+            ]
+        results_performance = perf.LossFunctionPerformance(regression, results) 
+        data_point = Meta + results_performance
+        data_point_string = ','.join([str(x) for x in data_point])
+        # put the result on the multiprocessing queue
+        q.put(data_point_string)
+        print(f"{ds} {count}/{int(total/6)}. {total_counter}/{total}")
+    except Exception as e:
+        print('Caught exception in worker thread')
+
+        # This prints the type, value, and stack trace of the
+        # current exception being handled.
+        traceback.print_exc()
+
+        print()
+        raise e
 
 def generate_data_package(fold: int, tenfolds: list, regression: bool, du: DataUtility):
     test_data, test_labels = copy.deepcopy(tenfolds[fold])
@@ -233,8 +246,8 @@ def data_writer(q, filename):
 
 if __name__ == '__main__':
 
-    headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
-    filename = 'PSOparallel_test.csv'
+    headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "maxIter", "loss1", "loss2"]
+    filename = 'PSO_tuning_take2.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -402,32 +415,57 @@ if __name__ == '__main__':
 
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
-    
-                hyperparameters = {
-                    "position_range": 10,
-                    "velocity_range": 1,
-                    "omega": tuned_parameters[z]["omega"],
-                    "c1": tuned_parameters[z]["c1"],
-                    "c2": tuned_parameters[z]["c2"],
-                    "vmax": 1,
-                    "pop_size": 1000                                        
-                    }
-                if data_set == "soybean": hyperparameters["vmax"] = 7
 
-                pool.apply_async(driver, args=(
-                    q, 
-                    10,
-                    data_set, 
-                    data_package,
-                    regression,
-                    du,
-                    Per,
-                    hidden_layers,
-                    hyperparameters,
-                    data_set_counter,
-                    180
-                ))
-                data_set_counter += 1
+                for repeat in range(3):
+                    omega = [.2, .5, .8]
+                    c1 = [.1, .5, .9, 5]
+                    c2 = [.1, .5, .9, 5]
+                    vmax = [1]
+                    pop_size = [1000, 10000]
+                    max_iter = [100, 1000]
+                    for a in omega:
+                        for b in c1:
+                            for c in c2:
+                                for d in vmax:
+                                    for e in pop_size:
+                                        for f in max_iter:
+                                            hyperparameters = {
+                                                "position_range": 10,
+                                                "velocity_range": 1,
+                                                "omega": a,
+                                                "c1": b,
+                                                "c2": c,
+                                                "vmax": d,
+                                                "pop_size": e,
+                                                "max_iter": f                                              
+                                                }
+                    # hyperparameters = {
+                    #     "position_range": 10,
+                    #     "velocity_range": 1,
+                    #     "omega": tuned_parameters[z]["omega"],
+                    #     "c1": tuned_parameters[z]["c1"],
+                    #     "c2": tuned_parameters[z]["c2"],
+                    #     "vmax": 1,
+                    #     "pop_size": 1000                                        
+                    #     }
+                    # if data_set == "soybean": hyperparameters["vmax"] = 7
+
+                                            pool.apply_async(driver, args=(
+                                                q, # queue
+                                                hyperparameters["max_iter"], # max iter
+                                                data_set, 
+                                                data_package,
+                                                regression,
+                                                du,
+                                                Per,
+                                                hidden_layers,
+                                                hyperparameters,
+                                                data_set_counter,
+                                                total_counter,
+                                                103680
+                                            ))
+                                            data_set_counter += 1
+                                            total_counter += 1
 
     ##############################
     # CLOSE THE MULTIPROCESS POOL
