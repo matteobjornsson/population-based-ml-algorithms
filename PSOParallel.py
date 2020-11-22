@@ -4,7 +4,7 @@ from NeuralNetwork import NeuralNetwork
 import DataUtility
 import numpy as np
 import copy
-import matplotlib.pyplot as plt
+import multiprocessing
 
 class Particle:
     '''
@@ -47,7 +47,7 @@ class PSO:
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, layers: list, hyperparameters: dict, NN:NeuralNetwork):
+    def __init__(self, layers: list, hyperparameters: dict, NN:NeuralNetwork, maxIter: int):
         #init general population 
             # random weight values, weight matrix is numpy array, matches network architecture
             # use similar weight init function as from NN
@@ -82,7 +82,7 @@ class PSO:
         self.gbest_fitness = float('inf')
         self.gbest_position = None
         # number of iterations 
-        self.max_t = 10
+        self.max_t = maxIter
 
 
         # fitness plotting:
@@ -143,7 +143,7 @@ class PSO:
         # track global best over time each iteration
         self.fitness_plot.append(self.gbest_fitness)
 
-def driver(q, ds: str, data_package: list, regression: bool, du: DataUtility, perf: Performance, hidden_layers: list, hyper_params: dict, count: int, total: int):
+def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: DataUtility, perf: Performance, hidden_layers: list, hyper_params: dict, count: int, total: int):
     # init all test data values
     test_data, test_labels, training_data, training_labels, output_size, input_size = data_package
     layers = [input_size] + hidden_layers + [output_size]
@@ -153,7 +153,7 @@ def driver(q, ds: str, data_package: list, regression: bool, du: DataUtility, pe
     nn.set_input_data(training_data, training_labels)
 
     # initi PSO and train it
-    pso = PSO(layers, hyper_params, nn)
+    pso = PSO(layers, hyper_params, nn, maxIter)
     for epoch in range(pso.max_t):
         pso.update_fitness()
         pso.update_position_and_velocity()
@@ -179,8 +179,7 @@ def driver(q, ds: str, data_package: list, regression: bool, du: DataUtility, pe
     data_point = Meta + results_performance
     data_point_string = ','.join([str(x) for x in data_point])
     # put the result on the multiprocessing queue
-    # q.put(data_point_string)
-    print(data_point_string)
+    q.put(data_point_string)
     print(f"{ds} {count}/{total}")
 
 def generate_data_package(fold: int, tenfolds: list, regression: bool, du: DataUtility):
@@ -220,11 +219,22 @@ def classify(test_data: np.ndarray, test_labels: np.ndarray, regression: bool, p
     results = perf.ConvertResultsDataStructure(ground_truth, estimates)
     return results
 
+# this function takes the results from the queue that all async jobs write to, and
+# writes the jobs to disk. This function is meant to be started as it's own process.
+# param q is the multiprocess Manager queue object shared by all jobs. 
+def data_writer(q, filename):
+    while True:
+        with open(filename, 'a') as f:
+            data_string = q.get()
+            if data_string == 'kill':
+                f.write('\n')
+                break
+            f.write(data_string + '\n')
 
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
-    filename = 'test.csv'
+    filename = 'PSOparallel_test.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -364,6 +374,17 @@ if __name__ == '__main__':
             "hidden_layer": [6,8]
         }
     }
+    ##############################################
+    # START MULTIPROCESS JOB POOL
+    ##############################################
+    manager = multiprocessing.Manager()
+    q = manager.Queue()
+    writer = multiprocessing.Process(target=data_writer, args=(q,filename))
+    writer.start()
+
+    pool = multiprocessing.Pool()
+    ##############################################
+
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
@@ -381,7 +402,7 @@ if __name__ == '__main__':
 
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
-
+    
                 hyperparameters = {
                     "position_range": 10,
                     "velocity_range": 1,
@@ -389,22 +410,30 @@ if __name__ == '__main__':
                     "c1": tuned_parameters[z]["c1"],
                     "c2": tuned_parameters[z]["c2"],
                     "vmax": 1,
-                    "pop_size": 100                                                
+                    "pop_size": 1000                                        
                     }
                 if data_set == "soybean": hyperparameters["vmax"] = 7
 
-                driver(
-                    q=list(), 
-                    ds=data_set, 
-                    data_package=data_package,
-                    regression=regression,
-                    du=du,
-                    perf=Per,
-                    hidden_layers=hidden_layers,
-                    hyper_params=hyperparameters,
-                    count=data_set_counter,
-                    total=total_counter
-                )
+                pool.apply_async(driver, args=(
+                    q, 
+                    10,
+                    data_set, 
+                    data_package,
+                    regression,
+                    du,
+                    Per,
+                    hidden_layers,
+                    hyperparameters,
+                    data_set_counter,
+                    180
+                ))
                 data_set_counter += 1
-                total_counter += 1
+
+    ##############################
+    # CLOSE THE MULTIPROCESS POOL
+    ##############################
+    pool.close()
+    pool.join()
+    q.put('kill')
+    writer.join()
 
