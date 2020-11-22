@@ -145,6 +145,7 @@ class PSO:
         self.fitness_plot.append(self.gbest_fitness)
 
 def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: DataUtility, perf: Performance, hidden_layers: list, hyper_params: dict, count: int, total_counter:int, total: int):
+    print("Job ", ds, count, "started")
     try:
         # init all test data values
         test_data, test_labels, training_data, training_labels, output_size, input_size = data_package
@@ -156,9 +157,11 @@ def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: D
 
         # initi PSO and train it
         pso = PSO(layers, hyper_params, nn, maxIter)
+        print("Job ", count, " PSO initialized. Hyperparameters:\n", hyper_params)
         for epoch in range(pso.max_t):
             pso.update_fitness()
             pso.update_position_and_velocity()
+            print("Job ", count, "generation ", epoch)
         
         # get best overall solution and set the NN weights
         bestSolution = pso.gbest_position
