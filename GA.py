@@ -402,16 +402,26 @@ if __name__ == '__main__':
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
-                maxgen = []
-                pops = [] 
-                mr = []
-                mra = []
-                crosss = []
+                maxgen = [250,500,1000]
+                pops = [10 * total_weights,20*total_Weights,2000] 
+                mr = [.5,.6,.4]
+                mra = [10,20,15]
+                crosss = [.5,.6]
                 for a in maxgen:
                     for b in pops:
                         for c in mr:
                             for d in mra:
                                 for e in crosss:
+                                        """
+                                              hyperparameters = {
+                                                "maxGen":100,
+                                                "pop_size":100,
+                                                "mutation_rate": .5,
+                                                "mutation_range": 10,
+                                                "crossover_rate": .5
+                                                }
+
+                                        """
                                         hyperparameters = {
                                               "maxGen":a,
                                               "pop_size":b,
