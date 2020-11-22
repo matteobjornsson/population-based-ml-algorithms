@@ -429,45 +429,45 @@ if __name__ == '__main__':
                 total_weights = 0 
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
-                pso = GA(layers,layers, total_weights, nn)
+                ga = GA(layers,layers, total_weights, nn)
                 plt.ion
-                for gen in range(pso.maxGen): 
+                for gen in range(ga.maxGen): 
                     print('**** gen ', gen, '*****')
                     print("BEFORE FITNESS")
-                    print(len(pso.population))
-                    pso.fitness()
+                    print(len(ga.population))
+                    ga.fitness()
                     print("AFTER FITNESS")
-                    print(len(pso.population))
-                    pso.selection()
+                    print(len(ga.population))
+                    ga.selection()
                     print("AFTER SELECTIOn")
-                    print(len(pso.population))
-                    pso.crossover()
+                    print(len(ga.population))
+                    ga.crossover()
                     print("AFTER CROSS OVER")
-                    print(len(pso.population))
+                    print(len(ga.population))
                     
 
-                    plt.plot(list(range(len(pso.globalfit))), pso.globalfit)
+                    plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
                     plt.draw()
                     plt.pause(0.00001)
                     plt.clf()
 
                 # grab the best solution and set the NN weights
-                bestSolution = pso.bestChromie.getChromie()
-                bestWeights = pso.nn.weight_transform(bestSolution)
-                pso.nn.weights = bestWeights
+                bestSolution = ga.bestChromie.getChromie()
+                bestWeights = ga.nn.weight_transform(bestSolution)
+                ga.nn.weights = bestWeights
 
-                ################################# new code for PSO end ###################################
+                ################################# new code for ga end ###################################
                 # plt.ioff()
-                # plt.plot(list(range(len(pso.globalfit))), pso.globalfit)
+                # plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
                 # plt.show()
                 # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
                 # plt.savefig('tuning_plots/' + img_name)
                 # plt.clf()
-                Estimation_Values = pso.nn.classify(test_data,test_labels)
+                Estimation_Values = ga.nn.classify(test_data,test_labels)
                 if regression == False: 
                     #Decode the One Hot encoding Value 
-                    Estimation_Values = pso.nn.PickLargest(Estimation_Values)
-                    test_labels_list = pso.nn.PickLargest(test_labels)
+                    Estimation_Values = ga.nn.PickLargest(Estimation_Values)
+                    test_labels_list = ga.nn.PickLargest(test_labels)
                     # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
                     # print(Estimation_Values)
                 else: 
