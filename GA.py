@@ -432,19 +432,9 @@ if __name__ == '__main__':
                 ga = GA(layers,layers, total_weights, nn)
                 plt.ion
                 for gen in range(ga.maxGen): 
-                    print('**** gen ', gen, '*****')
-                    print("BEFORE FITNESS")
-                    print(len(ga.population))
                     ga.fitness()
-                    print("AFTER FITNESS")
-                    print(len(ga.population))
                     ga.selection()
-                    print("AFTER SELECTIOn")
-                    print(len(ga.population))
                     ga.crossover()
-                    print("AFTER CROSS OVER")
-                    print(len(ga.population))
-                    
 
                     plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
                     plt.draw()
