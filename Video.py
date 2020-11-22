@@ -217,15 +217,22 @@ def main():
                     de.mutate_and_crossover()
                     
 
-                    plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                    plt.draw()
-                    plt.pause(0.00001)
-                    plt.clf()
+                   # plt.plot(list(range(len(de.globalbest))), de.globalbest)
+                   # plt.draw()
+                   # plt.pause(0.00001)
+                    #plt.clf()
                 # get the best overall solution and set the NN to those weights
+                #DE
                 bestSolution = de.bestChromie.getchromie()
                 bestWeights = de.nn.weight_transform(bestSolution)
                 de.nn.weights = bestWeights
-                ################################# new code for de end ###################################
+                #GA
+
+
+                #PS
+
+
+                #   ################################ new code for de end ###################################
                 # plt.ioff()
                 # plt.plot(list(range(len(de.globalbest))), de.globalbest)
                 # plt.show()
