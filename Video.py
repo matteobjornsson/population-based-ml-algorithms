@@ -5,115 +5,13 @@ import DataUtility
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
+import DE 
+import GA 
+import PSO 
 
 
 
-class individual(): 
- 
-    def __init__(self, Size):
-            self.fitness = float('inf')
-            self.Chromie = list() 
-            lowerbound = -10 
-            upperbound = 10 
-            for i in range(Size):
-                self.Chromie.append(random.uniform(lowerbound,upperbound))
-            self.Chromie = np.array(self.Chromie)
-    def getchromie(self): 
-        return self.Chromie
-    def setchromie(self,chrom):
-        self.Chromie = chrom 
-    def getfit(self): 
-        return self.fitness
-    def setfit(self,fitt): 
-        self.fitness = fitt
-
-class DE:
-    #this is the hyperparameter from mutation
-
-    #####################
-    # Initialize the population etc
-    ####################
-    def __init__(self, hyperparameters: dict ,Chromie_Size,nn):
-        #Hyperparameters v
-        self.beta = hyperparameters["beta"]
-        self.maxgens = hyperparameters["max_gen"]
-        self.pop_size = hyperparameters["population_size"]
-        self.probability_of_crossover = hyperparameters["crossover_rate"]
-        #Hyperparameters ^
-
-        self.population = list() #TODO: what data structure to use here?
-        for i in range(self.pop_size): 
-            temp = individual(Chromie_Size)
-            self.population.append(temp)
-        self.generation = 0
-        self.nn = nn 
-        self.globalbest = list() 
-        self.bestChromie = self.population[0]
-
-    ########################################
-    # Evaluate the fitness of an individual
-    ########################################
-    def fitness(self,chromie) -> float:
-        return self.nn.fitness(chromie)
-
-
-    ###################################
-    # grab 3 vectors from pop, without repalcement, generate trial vector
-    ###############################
-    def mutate_and_crossover(self):
-        bestfit = float('inf')
-        for i in range(len(self.population)):
-            nums = list()
-            nums.append(i)
-            count = 0 
-            while(count < 4): 
-                org = random.randint(0,len(self.population)-1)
-                if org in nums: 
-                    continue 
-                nums.append(org)
-                count = count +1
-            organism = self.population[i]
-            nums.remove(i)
-            organ1 = self.population[nums[0]]
-            organ2 = self.population[nums[1]]
-            organ3 = self.population[nums[2]]
-            temp = copy.deepcopy(organism.getchromie())
-            for j in range(len(organism.getchromie())): 
-                x1 = organ1.getchromie()[j]
-                x2 = organ2.getchromie()[j]
-                x3 = organ3.getchromie()[j]
-
-                b = self.beta
-                ColumnTV =  x1 + b * (x2 - x3)      
-                coin = random.random() 
-                if coin < self.probability_of_crossover: 
-                    temp[j] = ColumnTV
-                else: 
-                    #No crossover 
-                    continue 
-            fitness = self.fitness(temp)
-            if fitness < organism.getfit(): 
-                organism.setfit(fitness)
-                organism.setchromie(temp)
-            if fitness < bestfit: 
-                bestfit = fitness
-            if fitness < self.bestChromie.fitness:
-                self.bestChromie = organism
-            
-            self.population[i] = organism
-        self.globalbest.append(bestfit)
-
-    ##################################
-    # Main function down here? 
-    # Remember, functions we can dispatch as jobs with unique parameters = parallelizeable. 
-    #################################
-    def driver(self,input_parameters): 
-        # Until convergence: 
-            # for each individual:
-                # mutate and crossover to generate replacement 
-                # eval fitness of replacement, keep better of the two
-        pass
-if __name__ == '__main__':
+def main(): 
     print("Program Start")
     headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
     filename = 'DE_experimental_results.csv'
@@ -312,20 +210,29 @@ if __name__ == '__main__':
                     "max_gen": 100                                              
                     }
                 de = DE(hyperparameters,total_weights, nn)
+                ga = GA(hyperparameters, total_weights, nn)
+                pso = PSO(layers, hyperparameters, nn)
                 plt.ion
                 for gen in range(de.maxgens): 
                     de.mutate_and_crossover()
                     
 
-                    plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                    plt.draw()
-                    plt.pause(0.00001)
-                    plt.clf()
+                   # plt.plot(list(range(len(de.globalbest))), de.globalbest)
+                   # plt.draw()
+                   # plt.pause(0.00001)
+                    #plt.clf()
                 # get the best overall solution and set the NN to those weights
+                #DE
                 bestSolution = de.bestChromie.getchromie()
                 bestWeights = de.nn.weight_transform(bestSolution)
                 de.nn.weights = bestWeights
-                ################################# new code for de end ###################################
+                #GA
+
+
+                #PS
+
+
+                #   ################################ new code for de end ###################################
                 # plt.ioff()
                 # plt.plot(list(range(len(de.globalbest))), de.globalbest)
                 # plt.show()
@@ -369,3 +276,8 @@ if __name__ == '__main__':
                 total_counter += 1
 
     print("Program End ")
+
+
+
+
+main() 
