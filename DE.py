@@ -304,68 +304,87 @@ if __name__ == '__main__':
                 total_weights = 0 
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
-                print("number of weights to learn: ", total_weights)
-                hyperparameters = {
-                    "population_size": 10*total_weights,
-                    "beta": .5,
-                    "crossover_rate": .6, 
-                    "max_gen": 100                                              
-                    }
-                de = DE(hyperparameters,total_weights, nn)
-                plt.ion
-                for gen in range(de.maxgens): 
-                    de.mutate_and_crossover()
-                    
-
-                   # plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                   # plt.draw()
-                   # plt.pause(0.00001)
-                   # plt.clf()
-                # get the best overall solution and set the NN to those weights
-                bestSolution = de.bestChromie.getchromie()
-                bestWeights = de.nn.weight_transform(bestSolution)
-                de.nn.weights = bestWeights
-                ################################# new code for de end ###################################
-                # plt.ioff()
-                # plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                # plt.show()
-                # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
-                # plt.savefig('tuning_plots/' + img_name)
-                # plt.clf()
-                Estimation_Values = de.nn.classify(test_data,test_labels)
-                if regression == False: 
-                    #Decode the One Hot encoding Value 
-                    Estimation_Values = de.nn.PickLargest(Estimation_Values)
-                    test_labels_list = de.nn.PickLargest(test_labels)
-                    # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
-                    # print(Estimation_Values)
-                else: 
-                    Estimation_Values = Estimation_Values.tolist()
-                    test_labels_list = test_labels.tolist()[0]
-                    Estimation_Values = Estimation_Values[0]
+                #print("number of weights to learn: ", total_weights)
+                popss =[10*total_weights,20*total_weights,2000] 
+                bet = [.5,.7,.2]
+                cr = [.6,.5]
+                maxgen = [100,150,200]
+                """
                 
-                Estimat = Estimation_Values
-                groun = test_labels_list
-                
+                                hyperparameters = {
+                                    "population_size": 10*total_weights,
+                                    "beta": .5,
+                                    "crossover_rate": .6, 
+                                    "max_gen": 100                                              
+                                    }
+                """
+                for a in popss: 
+                    for b in bet:
+                        for c in cr: 
+                            for d in maxgen: 
 
-                Nice = Per.ConvertResultsDataStructure(groun, Estimat)
-                # print("THE GROUND VERSUS ESTIMATION:")
-                # print(Nice)
-            
 
-                # headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
-                Meta = [
-                    data_set, 
-                    len(hidden_layers), 
-                    hyperparameters["population_size"], 
-                    hyperparameters["beta"], 
-                    hyperparameters["crossover_rate"],
-                    hyperparameters["max_gen"]
-                    ]
+                                hyperparameters = {
+                                    "population_size": a,
+                                    "beta": b,
+                                    "crossover_rate": c, 
+                                    "max_gen": d                                          
+                                    }
+                                de = DE(hyperparameters,total_weights, nn)
+                                #plt.ion
+                                for gen in range(de.maxgens): 
+                                    de.mutate_and_crossover()
+                                    
 
-                Per.StartLossFunction(regression, Nice, Meta, filename)
-                print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
-                data_set_counter += 1
-                total_counter += 1
+                                # plt.plot(list(range(len(de.globalbest))), de.globalbest)
+                                # plt.draw()
+                                # plt.pause(0.00001)
+                                # plt.clf()
+                                # get the best overall solution and set the NN to those weights
+                                bestSolution = de.bestChromie.getchromie()
+                                bestWeights = de.nn.weight_transform(bestSolution)
+                                de.nn.weights = bestWeights
+                                ################################# new code for de end ###################################
+                                # plt.ioff()
+                                # plt.plot(list(range(len(de.globalbest))), de.globalbest)
+                                # plt.show()
+                                # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
+                                # plt.savefig('tuning_plots/' + img_name)
+                                # plt.clf()
+                                Estimation_Values = de.nn.classify(test_data,test_labels)
+                                if regression == False: 
+                                    #Decode the One Hot encoding Value 
+                                    Estimation_Values = de.nn.PickLargest(Estimation_Values)
+                                    test_labels_list = de.nn.PickLargest(test_labels)
+                                    # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
+                                    # print(Estimation_Values)
+                                else: 
+                                    Estimation_Values = Estimation_Values.tolist()
+                                    test_labels_list = test_labels.tolist()[0]
+                                    Estimation_Values = Estimation_Values[0]
+                                
+                                Estimat = Estimation_Values
+                                groun = test_labels_list
+                                
+
+                                Nice = Per.ConvertResultsDataStructure(groun, Estimat)
+                                # print("THE GROUND VERSUS ESTIMATION:")
+                                # print(Nice)
+                            
+
+                                # headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
+                                Meta = [
+                                    data_set, 
+                                    len(hidden_layers), 
+                                    hyperparameters["population_size"], 
+                                    hyperparameters["beta"], 
+                                    hyperparameters["crossover_rate"],
+                                    hyperparameters["max_gen"]
+                                    ]
+
+                                Per.StartLossFunction(regression, Nice, Meta, filename)
+                                print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
+                                data_set_counter += 1
+                                total_counter += 1
 
     print("Program End ")
