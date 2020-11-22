@@ -5,6 +5,7 @@ import DataUtility
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
+import pprint
 
 class Particle:
     '''
@@ -82,11 +83,14 @@ class PSO:
         self.gbest_fitness = float('inf')
         self.gbest_position = None
         # number of iterations 
-        self.max_t = 10
+        self.max_t = hyperparameters["max_t"]
 
 
         # fitness plotting:
         self.fitness_plot = []
+        self.particle_plots = []
+        for p in self.population:
+            self.particle_plots.append([])
 
     def update_position_and_velocity(self):
         # iterate over each particle
@@ -125,8 +129,7 @@ class PSO:
     def update_fitness(self) -> None:
     # for all particles, this method applies the individual's weights to the NN, 
     # feeds data set through and sets the fitness to the error of forward pass
-
-        layers = self.layers
+        index = 0
         for p in self.population:
             # run the dataset through the NN with the particle's weights to get fitness
             fitness = self.NN.fitness(p.position)
@@ -140,6 +143,9 @@ class PSO:
                 self.gbest_position = p.position
             # update particle fitness
             p.fitness = fitness
+
+            self.particle_plots[index].append(p.fitness)
+            index += 1
 
         # track global best over time each iteration
         self.fitness_plot.append(self.gbest_fitness)
@@ -298,13 +304,14 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-        if data_set != "soybean": continue
+        if data_set != 'glass': continue
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
         for j in range(10):
+            # if j != 1: continue
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -335,18 +342,23 @@ if __name__ == '__main__':
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
             
             for z in range(3):
+                if z != 2: continue
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
                 hyperparameters = {
                     "position_range": 10,
                     "velocity_range": 1,
-                    "omega": tuned_parameters[z]["omega"],
-                    "c1": tuned_parameters[z]["c1"],
-                    "c2": tuned_parameters[z]["c2"],
+                    "omega": .1, 
+                    # tuned_parameters[z]["omega"],
+                    "c1": .9,
+                    # tuned_parameters[z]["c1"],
+                    "c2": .1,
+                    # tuned_parameters[z]["c2"],
                     "vmax": 1,
-                    "pop_size": 100                                                
+                    "pop_size": 1000,
+                    "max_t": 50                                          
                     }
-                if data_set == "soybean": hyperparameters["vmax"] = 7
+                # if data_set == "soybean": hyperparameters["vmax"] = 7
 
                 layers = [input_size] + hidden_layers + [output_size]
 
@@ -354,15 +366,20 @@ if __name__ == '__main__':
                 nn.set_input_data(X,labels)
 
                 pso = PSO(layers, hyperparameters, nn)
+                pprint.pprint(hyperparameters)
 
                 # plt.ion
                 for epoch in range(pso.max_t):
                     pso.update_fitness()
                     pso.update_position_and_velocity()
-                    plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                    plt.draw()
-                    plt.pause(0.00001)
-                    plt.clf()
+                    if epoch % 10 == 0:
+                        for p in range(len(pso.particle_plots)):
+                            plt.plot(list(range(len(pso.particle_plots[p]))), pso.particle_plots[p])
+                        plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot, color='black', linewidth=4)
+                        plt.text(list(range(len(pso.fitness_plot)))[-1], pso.fitness_plot[-1], str(pso.fitness_plot[-1]))
+                        plt.draw()
+                        plt.pause(0.00001)
+                        plt.clf()
                 # get best overall solution and set the NN weights
                 bestSolution = pso.gbest_position
                 bestWeights = pso.NN.weight_transform(bestSolution)
@@ -370,9 +387,9 @@ if __name__ == '__main__':
                 ################################# new code for PSO end ###################################
                 # plt.ioff()
                 # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
-                # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
-                # plt.savefig('tuning_plots/' + img_name)
-                # plt.clf()
+                # for p in range(len(pso.particle_plots)):
+                #     plt.plot(list(range(len(pso.particle_plots[p]))), pso.particle_plots[p])
+                # plt.show()
 
                 Estimation_Values = pso.NN.classify(test_data,test_labels)
                 if regression == False: 
@@ -403,7 +420,7 @@ if __name__ == '__main__':
                     hyperparameters["c1"], 
                     hyperparameters["c2"],
                     hyperparameters["vmax"],
-                    1000 # pop size
+                    hyperparameters["pop_size"]
                     ]
                 Per.StartLossFunction(regression, Nice, Meta, filename)
                 print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
