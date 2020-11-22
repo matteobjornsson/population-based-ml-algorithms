@@ -401,7 +401,8 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-
+        if data_set == "soybean": continue
+        if data_set == "glass": continue
         regression = regression_data_set[data_set]
         tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
 
