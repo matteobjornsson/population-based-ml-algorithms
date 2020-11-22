@@ -116,7 +116,7 @@ class DE:
 if __name__ == '__main__':
     print("Program Start")
     headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
-    filename = 'DE_experimental_results.csv'
+    filename = 'DE_tuning_results.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -257,14 +257,14 @@ if __name__ == '__main__':
         }
     }
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
-    total_counter = 0
+    total_counter = 1
     for data_set in data_sets:
-        data_set_counter = 0
+        data_set_counter = 1
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(10):
+        for j in range(5):
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -305,10 +305,12 @@ if __name__ == '__main__':
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
                 #print("number of weights to learn: ", total_weights)
-                popss =[10*total_weights,20*total_weights,2000] 
-                bet = [.5,.7,.2]
-                cr = [.6,.5]
-                maxgen = [100,150,200]
+                popss =[5*total_weights, 10*total_weights,20*total_weights] # paper suggests 10 * total weight
+                bet = [.5,.8,.2] # note suggested from paper: [.5 , 1]
+                cr = [.1, .3, .8] # note suggested from paper: cr from [0,.3], [.8, 1] if not converging
+                maxgen = [100, 500]
+
+                total_trials = 4860
                 """
                 
                                 hyperparameters = {
@@ -383,7 +385,7 @@ if __name__ == '__main__':
                                     ]
 
                                 Per.StartLossFunction(regression, Nice, Meta, filename)
-                                print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
+                                print(f"{data_set_counter}/{int(total_trials/6)} {data_set}. {total_counter}/{total_trials}")
                                 data_set_counter += 1
                                 total_counter += 1
 
