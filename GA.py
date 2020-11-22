@@ -403,7 +403,7 @@ if __name__ == '__main__':
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
                 maxgen = [250,500,1000]
-                pops = [10 * total_weights,20*total_Weights,2000] 
+                pops = [500,1000,2000] 
                 mr = [.5,.6,.4]
                 mra = [10,20,15]
                 crosss = [.5,.6]

@@ -154,3 +154,6 @@ Data set,layers,omega,c1,c2,vmax,pop_size,loss1,loss2,
 soybean,0,0.5,0.1,5,7,1000,100.0,100.0
 Data set,layers,maxGen,pop_size,mutation_rate,mutation_range,crossover_rate,loss1,loss2,
 soybean,0,100,100,0.5,10,0.5,100.0,100.0
+Data set,layers,maxGen,pop_size,mutation_rate,mutation_range,crossover_rate,loss1,loss2,
+Data set,layers,maxGen,pop_size,mutation_rate,mutation_range,crossover_rate,loss1,loss2,
+Data set,layers,maxGen,pop_size,mutation_rate,mutation_range,crossover_rate,loss1,loss2,
