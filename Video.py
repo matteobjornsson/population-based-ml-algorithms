@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import DE 
 import GA 
 import PSO 
+import VideoNN
 
 
 
@@ -209,10 +210,34 @@ def main():
                     "crossover_rate": .6, 
                     "max_gen": 100                                              
                     }
-                de = DE(hyperparameters,total_weights, nn)
-                ga = GA(hyperparameters, total_weights, nn)
-                pso = PSO(layers, hyperparameters, nn)
-                plt.ion
+                hyperparameterss = {
+                                                "maxGen":100,
+                                                "pop_size":100,
+                                                "mutation_rate": .5,
+                                                "mutation_range": 10,
+                                                "crossover_rate": .5
+                                                }
+                hyperparametersss = {
+                    "position_range": 10,
+                    "velocity_range": 1,
+                    "omega": .1, 
+                    # tuned_parameters[z]["omega"],
+                    "c1": .9,
+                    # tuned_parameters[z]["c1"],
+                    "c2": .1,
+                    # tuned_parameters[z]["c2"],
+                    "vmax": 1,
+                    "pop_size": 1000,
+                    "max_t": 50                                          
+                    }
+                de = DE.DE(hyperparameters,total_weights, nn)
+                ga = GA.GA(hyperparameterss, total_weights, nn)
+                pso = PSO.PSO(layers, hyperparametersss, nn)
+                learning_rate = 3
+                momentum = 0 
+                VNN = VideoNN.NeuralNetworks(input_size, hidden_layers, regression, output_size,learning_rate,momentum)
+
+
                 for gen in range(de.maxgens): 
                     de.mutate_and_crossover()
                     
