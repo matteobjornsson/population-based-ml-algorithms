@@ -222,7 +222,7 @@ class GA:
 if __name__ == '__main__':
     print("Program Start")                
     headers = ["Data set", "layers", "maxGen", "pop_size", "mutation_rate", "mutation_range", "crossover_rate", "loss1", "loss2"]
-    filename = 'GA_experimental_results.csv'
+    filename = 'GA_tuning_results.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -363,15 +363,15 @@ if __name__ == '__main__':
         }
     }
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
-    total_counter = 0
+    total_counter = 1
     for data_set in data_sets:
 
-        data_set_counter = 0
+        data_set_counter = 1
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(10):
+        for j in range(3):
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -402,83 +402,104 @@ if __name__ == '__main__':
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
-
-                hyperparameters = {
-                    "maxGen":100,
-                    "pop_size":100,
-                    "mutation_rate": .5,
-                    "mutation_range": 10,
-                    "crossover_rate": .5
-                    }
-
-                layers = [input_size] + hidden_layers + [output_size]
-
-                nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
-                nn.set_input_data(X,labels)
-                total_weights = 0 
-                for i in range(len(layers)-1):
-                    total_weights += layers[i] * layers[i+1]
-
-                ga = GA(hyperparameters, total_weights, nn)
-
-                plt.ion
-                for gen in range(ga.maxGen): 
-                    ga.fitness()
-                    ga.selection()
-                    ga.crossover()
-
-                    #plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
-                    ##plt.draw()
-                    ##plt.pause(0.00001)
-                    #plt.clf()
-
-                # grab the best solution and set the NN weights
-                bestSolution = ga.bestChromie.getChromie()
-                bestWeights = ga.nn.weight_transform(bestSolution)
-                ga.nn.weights = bestWeights
-
-                ################################# new code for ga end ###################################
-                # plt.ioff()
-                # plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
-                # plt.show()
-                # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
-                # plt.savefig('tuning_plots/' + img_name)
-                # plt.clf()
-                Estimation_Values = ga.nn.classify(test_data,test_labels)
-                if regression == False: 
-                    #Decode the One Hot encoding Value 
-                    Estimation_Values = ga.nn.PickLargest(Estimation_Values)
-                    test_labels_list = ga.nn.PickLargest(test_labels)
-                    # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
-                    # print(Estimation_Values)
-                else: 
-                    Estimation_Values = Estimation_Values.tolist()
-                    test_labels_list = test_labels.tolist()[0]
-                    Estimation_Values = Estimation_Values[0]
+                maxgen = [500]
+                pops = [500] 
+                mr = [.2,.5,.8]
+                mra = [10]
+                crosss = [.2,.5]
                 
-                Estimat = Estimation_Values
-                groun = test_labels_list
-                
+                total_trials = 324
+                for a in maxgen:
+                    for b in pops:
+                        for c in mr:
+                            for d in mra:
+                                for e in crosss:
+                                        """
+                                              hyperparameters = {
+                                                "maxGen":100,
+                                                "pop_size":100,
+                                                "mutation_rate": .5,
+                                                "mutation_range": 10,
+                                                "crossover_rate": .5
+                                                }
 
-                Nice = Per.ConvertResultsDataStructure(groun, Estimat)
-                # print("THE GROUND VERSUS ESTIMATION:")
-                # print(Nice)
-            
+                                        """
+                                        hyperparameters = {
+                                              "maxGen":a,
+                                              "pop_size":b,
+                                              "mutation_rate": c,
+                                              "mutation_range": d,
+                                              "crossover_rate": e                                          
+                                            }
+                                        layers = [input_size] + hidden_layers + [output_size]
 
-                # headers = ["Data set", "layers", "maxGen", "pop_size", "mutation_rate", "mutation_range", "crossover_rate", "loss1", "loss2"]
-                Meta = [
-                    data_set, 
-                    len(hidden_layers), 
-                    hyperparameters["maxGen"], 
-                    hyperparameters["pop_size"], 
-                    hyperparameters["mutation_rate"],
-                    hyperparameters["mutation_range"],
-                    hyperparameters["crossover_rate"]
-                    ]
-                Per.StartLossFunction(regression, Nice, Meta, filename)
-                print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
-                data_set_counter += 1
-                total_counter += 1
+                                        nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
+                                        nn.set_input_data(X,labels)
+                                        total_weights = 0 
+                                        for i in range(len(layers)-1):
+                                            total_weights += layers[i] * layers[i+1]
+
+                                        ga = GA(hyperparameters, total_weights, nn)
+
+                                        # plt.ion
+                                        for gen in range(ga.maxGen): 
+                                            ga.fitness()
+                                            ga.selection()
+                                            ga.crossover()
+
+                                            #plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
+                                            ##plt.draw()
+                                            ##plt.pause(0.00001)
+                                            #plt.clf()
+
+                                        # grab the best solution and set the NN weights
+                                        bestSolution = ga.bestChromie.getChromie()
+                                        bestWeights = ga.nn.weight_transform(bestSolution)
+                                        ga.nn.weights = bestWeights
+
+                                        ################################# new code for ga end ###################################
+                                        # plt.ioff()
+                                        # plt.plot(list(range(len(ga.globalfit))), ga.globalfit)
+                                        # plt.show()
+                                        # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
+                                        # plt.savefig('tuning_plots/' + img_name)
+                                        # plt.clf()
+                                        Estimation_Values = ga.nn.classify(test_data,test_labels)
+                                        if regression == False: 
+                                            #Decode the One Hot encoding Value 
+                                            Estimation_Values = ga.nn.PickLargest(Estimation_Values)
+                                            test_labels_list = ga.nn.PickLargest(test_labels)
+                                            # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
+                                            # print(Estimation_Values)
+                                        else: 
+                                            Estimation_Values = Estimation_Values.tolist()
+                                            test_labels_list = test_labels.tolist()[0]
+                                            Estimation_Values = Estimation_Values[0]
+                                        
+                                        Estimat = Estimation_Values
+                                        groun = test_labels_list
+                                        
+
+                                        Nice = Per.ConvertResultsDataStructure(groun, Estimat)
+                                        # print("THE GROUND VERSUS ESTIMATION:")
+                                        # print(Nice)
+                                    
+
+                                        # headers = ["Data set", "layers", "maxGen", "pop_size", "mutation_rate", "mutation_range", "crossover_rate", "loss1", "loss2"]
+                                        Meta = [
+                                            data_set, 
+                                            len(hidden_layers), 
+                                            hyperparameters["maxGen"], 
+                                            hyperparameters["pop_size"], 
+                                            hyperparameters["mutation_rate"],
+                                            hyperparameters["mutation_range"],
+                                            hyperparameters["crossover_rate"]
+                                            ]
+                                        Per.StartLossFunction(regression, Nice, Meta, filename)
+
+                                        print(f"{data_set_counter}/{int(total_trials)/6} {data_set}. {total_counter}/{total_trials} total")
+                                        data_set_counter += 1
+                                        total_counter += 1
 
 
 
