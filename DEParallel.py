@@ -33,7 +33,7 @@ class DE:
     #####################
     # Initialize the population etc
     ####################
-    def __init__(self, hyperparameters: dict ,Chromie_Size,nn):
+    def __init__(self, hyperparameters:dict , Chromie_Size:int , nn:NeuralNetwork):
         #Hyperparameters v
         self.beta = hyperparameters["beta"]
         self.maxgens = hyperparameters["max_gen"]
@@ -49,9 +49,7 @@ class DE:
         self.nn = nn 
         self.globalbest = list() 
         self.bestChromie = self.population[0]
-        self.particle_plots = []
-        for p in range(self.pop_size):
-            self.particle_plots.append([])
+
     ########################################
     # Evaluate the fitness of an individual
     ########################################
@@ -94,7 +92,7 @@ class DE:
                     #No crossover 
                     continue 
             fitness = self.fitness(temp)
-            # self.particle_plots[i].append(fitness)
+
             if fitness < organism.getfit(): 
                 organism.setfit(fitness)
                 organism.setchromie(temp)
@@ -124,6 +122,8 @@ def driver(q, ds: str, data_package: list, regression: bool, perf: Performance, 
         de = DE(hyper_params,total_weights, nn)
         # plt.ion
         for gen in range(de.maxgens): 
+            if gen % 10 == 0:
+                print(ds, "Job ", count, "gen ", gen, "/", de.maxgens)
             de.mutate_and_crossover()
         
         # get best overall solution and set the NN weights
@@ -405,13 +405,23 @@ if __name__ == '__main__':
                                     "crossover_rate": c, 
                                     "max_gen": d                                          
                                     }
+                                # def driver(
+                                #   q, 
+                                #   ds: str, 
+                                #   data_package: list,     
+                                #   regression: bool, 
+                                #   perf: Performance, 
+                                #   hidden_layers: list, 
+                                #   hyper_params: dict, 
+                                #   count: int, 
+                                #   total_counter:int, 
+                                #   total: int):
 
                                 pool.apply_async(driver, args=(
                                     q, # queue
                                     data_set, 
                                     data_package,
                                     regression,
-                                    du,
                                     Per,
                                     hidden_layers,
                                     hyperparameters,
