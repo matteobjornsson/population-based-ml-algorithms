@@ -134,7 +134,7 @@ def driver(q, ds: str, data_package: list, regression: bool, perf: Performance, 
         # headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
 
         Meta = [
-            data_set, 
+            ds, 
             len(hidden_layers), 
             hyperparameters["population_size"], 
             hyperparameters["beta"], 
