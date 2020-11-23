@@ -1,0 +1,6 @@
+Data set,layers,maxGen,pop_size,mutation_rate,mutation_range,crossover_rate,loss1,loss2,
+soybean,0,250,500,0.2,10,0.2,100.0,100.0
+soybean,0,250,500,0.2,10,0.5,100.0,100.0
+soybean,0,250,500,0.5,10,0.2,100.0,100.0
+soybean,0,250,500,0.5,10,0.5,100.0,100.0
+soybean,0,250,500,0.8,10,0.2,100.0,100.0
