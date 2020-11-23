@@ -116,6 +116,7 @@ class GA:
     # Evaluate the fitness of an individual
     ########################################
     def pfitness(self,) -> float:
+        print("FITNESS")
         #Fitness Function will be Mean squared Error
         for i in self.population:  
             fitscore = self.nn.fitness(i.getChromie()) 
@@ -154,7 +155,7 @@ class GA:
     # pick a subset of POP based on fitness OR some sort of random or ranked selection
     #####################################
     def Pselection(self):
-
+        print("SELECTION")
         self.population = sorted(self.population, key=lambda individual: individual.fitness)
         bestChromie = self.population[0]
         self.globalfit.append(bestChromie.fitness)
@@ -168,10 +169,16 @@ class GA:
         Subset = Subset + 1 
         for j in range(Subset): 
             choice = random.random()
+            print("RANDOM CHOICE")
+            print(choice)
             sum = 0
             for i in range(pop):
                 sum += 2/pop * (pop - (i+1))/(pop - 1)
+                print("Chromosome picked")
+                print(sum)
                 if sum > choice:
+                    print("Parent selected")
+                    print(self.population[i])
                     newPopulation.append(self.population[i])
                     break
 
@@ -233,18 +240,17 @@ class GA:
     # make new generation based on parent selection by swapping chromosomes 
     ####################################
     def Pcrossover(self): 
+        print("CROSS OVER ")
         self.generation = self.generation + 1
         NewPop = list() 
-        #{01 12 23 34 }
-        #TODO: pick crossover mechanism (uniform?)
         for i in range(len(self.population)-1): 
 
             NewChromoC1 = list()
             NewChromoC2 = list()  
-
+            print("PICKING PARENTS")
             Parent1 = self.population[i]
             Parent2 = self.population[i+1]
-            
+            print("CREATING 2 NEW CHILDREN ")
             Child1 = individual()
             Child2 = individual()
             
@@ -265,6 +271,11 @@ class GA:
                     bit2 = bit2[i]
                 NewChromoC1.append(bit)
                 NewChromoC2.append(bit2)
+            print("NEW CHILDRENS CHROMOSOMES")
+            print("Child1 ")
+            print(NewChromoC1)
+            print("Child 2 ")
+            print(NewChromoC2)
             NewChromoC1 = np.array(NewChromoC1)
             NewChromoC2 = np.array(NewChromoC2)
             Child1.SetChromie(NewChromoC1)
@@ -296,14 +307,19 @@ class GA:
     # introduce random change to each individual in the generation
     ###############################
     def Pmutate(self):
+        print("MUTATION")
         for i in self.population:
             perc = random.random()
             if perc > self.mutation_rate: 
+                print("NO MUTATION ")
                 continue 
             else: 
+                print("MUTATION")
                 bit = random.randint(0,len(i.getChromie())-1)
                 temp = i.getChromie()
                 temp[bit] = random.uniform(-self.mutation_range,self.mutation_range)
+                print("NEW CHROMOSOME")
+                print(temp )
                 i.SetChromie(temp)  
 
 
