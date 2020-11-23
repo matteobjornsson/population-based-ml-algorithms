@@ -14,6 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time 
 import copy
+import traceback
 
 class NeuralNetwork:
 
@@ -130,7 +131,10 @@ class NeuralNetwork:
         # trim matrix to prevent overflow
         Values[Values > 700] = 700
         # return softmax calculation
-        return np.exp(Values) / np.sum(np.exp(Values), axis=0)
+        numerator = np.exp(Values)
+        denom = np.sum(np.exp(Values), axis=0)
+        denom = np.nan_to_num(denom)
+        return numerator/denom
 
 
     ################# Error functions #####################
