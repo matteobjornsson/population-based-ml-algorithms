@@ -222,9 +222,9 @@ class NeuralNetwork:
             
         self.pass_count += 1
         # save the error to be plotted over time
-        if self.pass_count > 1:
-            self.error_y.append(error)
-            self.error_x.append(self.pass_count)
+        # if self.pass_count > 1:
+        #     self.error_y.append(error)
+        #     self.error_x.append(self.pass_count)
         return error
         #This function will use packprogation for a neural network to update the weights 
   
