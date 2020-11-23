@@ -371,7 +371,7 @@ if __name__ == '__main__':
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(5):
+        for j in range(3):
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -402,13 +402,13 @@ if __name__ == '__main__':
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
-                maxgen = [250,500,1000]
-                pops = [500,1000,2000] 
+                maxgen = [500]
+                pops = [500] 
                 mr = [.2,.5,.8]
                 mra = [10]
                 crosss = [.2,.5]
                 
-                total_trials = 4860
+                total_trials = 324
                 for a in maxgen:
                     for b in pops:
                         for c in mr:
