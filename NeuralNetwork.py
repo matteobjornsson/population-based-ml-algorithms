@@ -144,7 +144,7 @@ class NeuralNetwork:
                 # This prints the type, value, and stack trace of the
                 # current exception being handled.
                 traceback.print_exc()
-
+                print("values: \n", Values)
                 print("numerator: \n", numerator)
                 print("Denominator: \n", denom)
                 raise e
