@@ -15,7 +15,7 @@ import VideoNN
 def main(): 
     print("Program Start")
     headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
-    filename = 'DE_experimental_results.csv'
+    filename = 'DE_experimental_resultsFINAL.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -203,7 +203,7 @@ def main():
                 total_weights = 0 
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
-                print("number of weights to learn: ", total_weights)
+            
                 hyperparameters = {
                     "population_size": 10*total_weights,
                     "beta": .5,
@@ -237,10 +237,34 @@ def main():
                 momentum = 0 
                 VNN = VideoNN.NeuralNetworks(input_size, hidden_layers, regression, output_size,learning_rate,momentum)
 
-
+                counter = 0 
+                print("DE OPERATIONS ")
                 for gen in range(de.maxgens): 
+                    if counter == 10: 
+                        break 
+                    print("MUTATE AND CROSS OVER ")
                     de.mutate_and_crossover()
-                    
+                    counter = counter+1 
+                
+                counter = 0 
+                print("GA OPERATIONS")
+                for gen in range(ga.maxgens): 
+                    if counter == 10: 
+                        break 
+                    print()
+                    ga.fitness()
+                    ga.selection()
+                    ga.crossover()
+                    counter = counter + 1 
+
+                counter = 0 
+                print("PSO OPERATIONS")
+                for epoch in range(pso.max_t):
+                    if counter == 10: 
+                        break 
+                    pso.update_fitness()
+                    pso.update_position_and_velocity()
+                    counter = count + 1 
 
                    # plt.plot(list(range(len(de.globalbest))), de.globalbest)
                    # plt.draw()
