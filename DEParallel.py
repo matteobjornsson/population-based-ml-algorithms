@@ -136,10 +136,10 @@ def driver(q, ds: str, data_package: list, regression: bool, perf: Performance, 
         Meta = [
             ds, 
             len(hidden_layers), 
-            hyperparameters["population_size"], 
-            hyperparameters["beta"], 
-            hyperparameters["crossover_rate"],
-            hyperparameters["max_gen"]
+            hyper_params["population_size"], 
+            hyper_params["beta"], 
+            hyper_params["crossover_rate"],
+            hyper_params["max_gen"]
             ]
         results_performance = perf.LossFunctionPerformance(regression, results) 
         data_point = Meta + results_performance
