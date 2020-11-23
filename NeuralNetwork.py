@@ -145,7 +145,8 @@ class NeuralNetwork:
                 # current exception being handled.
                 traceback.print_exc()
 
-                print(Values)
+                print("numerator: \n", numerator)
+                print("Denominator: \n", denom)
                 raise e
 
 
