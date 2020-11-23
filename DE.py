@@ -49,7 +49,9 @@ class DE:
         self.nn = nn 
         self.globalbest = list() 
         self.bestChromie = self.population[0]
-
+        self.particle_plots = []
+        for p in range(self.pop_size):
+            self.particle_plots.append([])
     ########################################
     # Evaluate the fitness of an individual
     ########################################
@@ -92,6 +94,7 @@ class DE:
                     #No crossover 
                     continue 
             fitness = self.fitness(temp)
+            # self.particle_plots[i].append(fitness)
             if fitness < organism.getfit(): 
                 organism.setfit(fitness)
                 organism.setchromie(temp)
@@ -259,12 +262,13 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 1
     for data_set in data_sets:
+        # if data_set == "abalone": continue
         data_set_counter = 1
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(5):
+        for j in range(3):
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -300,17 +304,18 @@ if __name__ == '__main__':
 
                 nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
                 nn.set_input_data(X,labels)
+                
 
                 total_weights = 0 
                 for i in range(len(layers)-1):
                     total_weights += layers[i] * layers[i+1]
                 #print("number of weights to learn: ", total_weights)
-                popss =[5*total_weights, 10*total_weights,20*total_weights] # paper suggests 10 * total weight
+                popss =[500] # paper suggests 10 * total weight
                 bet = [.5,.8,.2] # note suggested from paper: [.5 , 1]
                 cr = [.1, .3, .8] # note suggested from paper: cr from [0,.3], [.8, 1] if not converging
-                maxgen = [100, 500]
+                maxgen = [500]
 
-                total_trials = 4860
+                total_trials = 486
                 """
                 
                                 hyperparameters = {
@@ -333,15 +338,19 @@ if __name__ == '__main__':
                                     "max_gen": d                                          
                                     }
                                 de = DE(hyperparameters,total_weights, nn)
-                                #plt.ion
+                                # plt.ion
                                 for gen in range(de.maxgens): 
+                                    print(data_set, gen, '/', de.maxgens)
                                     de.mutate_and_crossover()
                                     
 
-                                # plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                                # plt.draw()
-                                # plt.pause(0.00001)
-                                # plt.clf()
+                                    # for p in range(len(de.particle_plots)):
+                                    #     plt.plot(list(range(len(de.particle_plots[p]))), de.particle_plots[p])
+                                    # plt.plot(list(range(len(de.globalbest))), de.globalbest, color='black', linewidth=2)
+                                    # plt.text(list(range(len(de.globalbest)))[-1], de.globalbest[-1], str(de.globalbest[-1]))
+                                    # plt.draw()
+                                    # plt.pause(0.00001)
+                                    # plt.clf()
                                 # get the best overall solution and set the NN to those weights
                                 bestSolution = de.bestChromie.getchromie()
                                 bestWeights = de.nn.weight_transform(bestSolution)
