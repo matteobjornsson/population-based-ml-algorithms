@@ -58,7 +58,10 @@ class DE:
     def fitness(self,chromie) -> float:
         return self.nn.fitness(chromie)
 
-
+    def printfitness(self,chromie) -> float:
+        print("FITNESS")
+        print(self.nn.fitness(chromie))
+        return self.nn.fitness(chromie)
     ###################################
     # grab 3 vectors from pop, without repalcement, generate trial vector
     ###############################
@@ -106,16 +109,63 @@ class DE:
             self.population[i] = organism
         self.globalbest.append(bestfit)
 
-    ##################################
-    # Main function down here? 
-    # Remember, functions we can dispatch as jobs with unique parameters = parallelizeable. 
-    #################################
-    def driver(self,input_parameters): 
-        # Until convergence: 
-            # for each individual:
-                # mutate and crossover to generate replacement 
-                # eval fitness of replacement, keep better of the two
-        pass
+            ###################################
+    # grab 3 vectors from pop, without repalcement, generate trial vector
+    ###############################
+    def Pmutate_and_crossover(self):
+        bestfit = float('inf')
+        for i in range(len(self.population)):
+            print("FOR EACH GIVEN MEMBER IN THE POPULATION ")
+            nums = list()
+            nums.append(i)
+            count = 0 
+            print("RANDOMLY PICK 3 OTHER MEMBERS IN THE POPULATION ")
+            while(count < 4): 
+                org = random.randint(0,len(self.population)-1)
+                if org in nums: 
+                    continue 
+                nums.append(org)
+                count = count +1
+            organism = self.population[i]
+            nums.remove(i)
+            organ1 = self.population[nums[0]]
+            organ2 = self.population[nums[1]]
+            organ3 = self.population[nums[2]]
+            temp = copy.deepcopy(organism.getchromie())
+            for j in range(len(organism.getchromie())): 
+                x1 = organ1.getchromie()[j]
+                x2 = organ2.getchromie()[j]
+                x3 = organ3.getchromie()[j]
+
+                b = self.beta
+                ColumnTV =  x1 + b * (x2 - x3)
+                print("USE THE FOLLOWING EQUATION TO BUILD A POTENTIAL CROSS OVER CHROMSOME")      
+                print("x1 + b * (x2 - x3)")
+                print(ColumnTV)
+                coin = random.random() 
+                if coin < self.probability_of_crossover: 
+                    temp[j] = ColumnTV
+                else: 
+                    #No crossover 
+                    continue 
+            print("CALCULATE THE FITNESS OF THE NEW CHROMOSOME")
+            fitness = self.fitness(temp)
+            print(fitness)
+            # self.particle_plots[i].append(fitness)
+            print("IF THE FITNESS IS BETTER SET THE MEMBER OF THE POPULATIONS CHROMOSOME TO THE NEW CHROMOSOME ")
+            if fitness < organism.getfit(): 
+                organism.setfit(fitness)
+                organism.setchromie(temp)
+            
+            if fitness < bestfit: 
+                bestfit = fitness
+            if fitness < self.bestChromie.fitness:
+                self.bestChromie = organism
+            
+            self.population[i] = organism
+        self.globalbest.append(bestfit)
+
+
 if __name__ == '__main__':
     print("Program Start")
     headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
@@ -340,7 +390,7 @@ if __name__ == '__main__':
                                 de = DE(hyperparameters,total_weights, nn)
                                 # plt.ion
                                 for gen in range(de.maxgens): 
-                                    print(data_set, gen, '/', de.maxgens)
+                                    #print(data_set, gen, '/', de.maxgens)
                                     de.mutate_and_crossover()
                                     
 
