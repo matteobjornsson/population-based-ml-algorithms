@@ -122,8 +122,6 @@ def driver(q, ds: str, data_package: list, regression: bool, perf: Performance, 
         de = DE(hyper_params,total_weights, nn)
         # plt.ion
         for gen in range(de.maxgens): 
-            if gen % 10 == 0:
-                print(ds, "Job ", count, "gen ", gen, "/", de.maxgens)
             de.mutate_and_crossover()
         
         # get best overall solution and set the NN weights
