@@ -222,7 +222,7 @@ class GA:
 if __name__ == '__main__':
     print("Program Start")                
     headers = ["Data set", "layers", "maxGen", "pop_size", "mutation_rate", "mutation_range", "crossover_rate", "loss1", "loss2"]
-    filename = 'GA_tuning_results.csv'
+    filename = 'GA_tuning_resultsFINAL.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
