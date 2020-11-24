@@ -466,7 +466,7 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-
+        if data_set != "abalone": continue
         regression = regression_data_set[data_set]
         tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
 
@@ -479,6 +479,7 @@ if __name__ == '__main__':
             data_package = generate_data_package(fold=j, tenfolds=tenfold_data_and_labels, regression=regression, du=du)
 
             for z in range(3):
+                if z != 2: continue
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
                 # popss =[100] # paper suggests 10 * total weight
