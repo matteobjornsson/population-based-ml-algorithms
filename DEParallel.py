@@ -363,7 +363,7 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-
+        if data_set != "abalone": continue
         regression = regression_data_set[data_set]
         tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
 
@@ -378,7 +378,7 @@ if __name__ == '__main__':
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
-                popss =[500] # paper suggests 10 * total weight
+                popss =[100] # paper suggests 10 * total weight
                 bet = [.5,.8,.2] # note suggested from paper: [.5 , 1]
                 cr = [.1, .3, .8] # note suggested from paper: cr from [0,.3], [.8, 1] if not converging
                 maxgen = [500]
