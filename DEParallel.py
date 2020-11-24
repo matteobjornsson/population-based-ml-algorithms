@@ -345,7 +345,7 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-        if data_set != "abalone": continue
+
         regression = regression_data_set[data_set]
         tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
 
@@ -365,7 +365,7 @@ if __name__ == '__main__':
                 # cr = [.1, .3, .8] # note suggested from paper: cr from [0,.3], [.8, 1] if not converging
                 # maxgen = [500]
 
-                # total_trials = 486
+                total_trials = 180
                 
                 hyperparameters = {
                     "population_size": 500,
@@ -373,6 +373,7 @@ if __name__ == '__main__':
                     "crossover_rate": tuned_parameters[z]["cr"], 
                     "max_gen": 500                                              
                     }
+                if data_set == "abalone": hyperparameters["population_size"] = 100
                 # for a in popss: 
                 #     for b in bet:
                 #         for c in cr: 
