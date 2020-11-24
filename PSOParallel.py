@@ -3,6 +3,7 @@ import Performance
 from NeuralNetwork import NeuralNetwork
 import DataUtility
 import numpy as np
+import pandas as pd
 import copy
 import multiprocessing
 import traceback
@@ -400,6 +401,8 @@ if __name__ == '__main__':
     ##############################################
 
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
+    previous_trials = pd.read_csv(filename)
+
     total_counter = 0
     for data_set in data_sets:
         if data_set != "abalone": continue
@@ -411,7 +414,7 @@ if __name__ == '__main__':
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(5):
+        for j in range(3):
             data_package = generate_data_package(fold=j, tenfolds=tenfold_data_and_labels, regression=regression, du=du)
 
             for z in range(3):
@@ -423,6 +426,8 @@ if __name__ == '__main__':
                 vmax = [1]
                 pop_size = [100]
                 max_iter = [500]
+                total_trials = 972
+
                 for a in omega:
                     for b in c1:
                         for c in c2:
@@ -439,16 +444,36 @@ if __name__ == '__main__':
                                             "pop_size": e,
                                             "max_iter": f                                              
                                             }
-                # hyperparameters = {
-                #     "position_range": 10,
-                #     "velocity_range": 1,
-                #     "omega": tuned_parameters[z]["omega"],
-                #     "c1": tuned_parameters[z]["c1"],
-                #     "c2": tuned_parameters[z]["c2"],
-                #     "vmax": 1,
-                #     "pop_size": 1000                                        
-                #     }
-                # if data_set == "soybean": hyperparameters["vmax"] = 7
+                                        # check if we have already done this hyperparameter set:
+                                        skip = False
+                                        for i in range(len(previous_trials)):
+                                            try:
+                                                # try to pick out all variables
+                                                v_data_set = str(previous_trials['Data set'][i])
+                                                v_omega = float(previous_trials['omega'][i])
+                                                v_c1 = float(previous_trials['c1'][i])
+                                                v_c2 = float(previous_trials['c2'][i])
+                                                v_vmax = float(previous_trials['vmax'][i])
+                                                v_pop = float(previous_trials['pop_size'][i])
+                                                v_max_iter = float(previous_trials['maxIter'][i])
+                                                # check if the current hyperparameter set already exists in the csv
+                                                if (
+                                                    data_set == v_data_set and 
+                                                    v_omega == a and
+                                                    v_c1 == b and
+                                                    v_c2 == c and
+                                                    v_vmax == d and
+                                                    v_pop == e and
+                                                    v_max_iter == f):
+                                                    # if it exists in the csv, then set the skip flag to true
+                                                    skip = True
+                                                    break
+                                            except:
+                                                # in the case that a line is unexpected text, skip just that line in the csv
+                                                continue
+                                        # if the current set of hyperparameters was found in the csv, skip will be true, so skip this hyperparameter set
+                                        if skip:
+                                            continue
 
                                         pool.apply_async(driver, args=(
                                             q, # queue
@@ -462,7 +487,7 @@ if __name__ == '__main__':
                                             hyperparameters,
                                             data_set_counter,
                                             total_counter,
-                                            2880
+                                            total_trials
                                         ))
                                         data_set_counter += 1
                                         total_counter += 1
