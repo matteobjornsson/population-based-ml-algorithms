@@ -180,7 +180,7 @@ def main():
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-        if data_set != 'soybean':
+        if data_set != 'glass':
             continue 
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
@@ -291,8 +291,8 @@ def main():
 
 
                 Estimation_Values = de.nn.classify(test_data,test_labels)
-                Estimation_Values1 = ga.nn.classifiy(test_data,test_labels)
-                Estimation_Values2 = pso.nn.classify(test_data,test_labels)
+                Estimation_Values1 = ga.nn.classify(test_data,test_labels)
+                Estimation_Values2 = pso.NN.classify(test_data,test_labels)
                 Estimation_Values3 = VNN.classify(test_data,test_labels)
                 if regression == False: 
                     #Decode the One Hot encoding Value 
@@ -300,9 +300,9 @@ def main():
                     test_labels_list = de.nn.PickLargest(test_labels)
                     Estimation_Values1 = ga.nn.PickLargest(Estimation_Values1)
                     Tll = ga.nn.PickLargest(test_labels)
-                    Estimation_Values2 = pso.nn.PickLargest(Estimation_Values2)
-                    tll1 = pso.nn.PickLargest(test_labels)
-                    Estimation_Values3 = VNN.classify(Estimation_Values3)
+                    Estimation_Values2 = pso.NN.PickLargest(Estimation_Values2)
+                    tll1 = pso.NN.PickLargest(test_labels)
+                    Estimation_Values3 = VNN.PickLargest(Estimation_Values3)
                     tll = VNN.PickLargest(test_labels)
 
 
@@ -317,15 +317,23 @@ def main():
                 Estimat = Estimation_Values
                 groun = test_labels_list
                 
-
+                meta = list() 
                 Nice = Per.ConvertResultsDataStructure(groun, Estimat)
-                Nice1 = Per.ConvertResultsDataStructure(Tll, Estimatation_Values1)
-                Nice2 = Per.ConvertResultsDataStructure(tll1, Estimatation_Values2)
-                Nice3 = Per.ConvertResultsDataStructure(tll, Estimatation_Values3)
-                DEss = per.StartLossFunction(regression,Nice)
-                GAss = per.StartLossFunction(regression,Nice1)
-                PSOSS = per.StartLossFunction(regression,Nice2)
-                VNNS = per.StartLossFunction(regression,Nice3)
+                Nice1 = Per.ConvertResultsDataStructure(Tll, Estimation_Values1)
+                Nice2 = Per.ConvertResultsDataStructure(tll1, Estimation_Values2)
+                Nice3 = Per.ConvertResultsDataStructure(tll, Estimation_Values3)
+                DEss = Per.StartLossFunction(regression,Nice,meta)
+                GAss = Per.StartLossFunction(regression,Nice1,meta)
+                PSOSS = Per.StartLossFunction(regression,Nice2,meta)
+                VNNS = Per.StartLossFunction(regression,Nice3,meta)
+                print("DE")
+                print(DEss)
+                print("GA")
+                print(GAss)
+                print("PSO")
+                print(PSOSS)
+                print("NN Back prop.")
+                print(VNNS)
 
                 # print("THE GROUND VERSUS ESTIMATION:")
                 # print(Nice)
