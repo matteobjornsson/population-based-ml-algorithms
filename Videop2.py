@@ -180,7 +180,7 @@ def main():
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-        if data_set != 'glass':
+        if data_set != 'Cancer':
             continue 
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
@@ -223,6 +223,11 @@ def main():
 
                 nn = NeuralNetwork(input_size, hidden_layers, regression, output_size)
                 nn.set_input_data(X,labels)
+                nn1 = NeuralNetwork(input_size, hidden_layers, regression, output_size)
+                nn1.set_input_data(X,labels)
+                nn2 = NeuralNetwork(input_size, hidden_layers, regression, output_size)
+                nn2.set_input_data(X,labels)
+
 
                 total_weights = 0 
                 for i in range(len(layers)-1):
@@ -255,8 +260,8 @@ def main():
                     "max_t": 50                                          
                     }
                 de = DE.DE(hyperparameters,total_weights, nn)
-                ga = GA.GA(hyperparameterss, total_weights, nn)
-                pso = PSO.PSO(layers, hyperparametersss, nn)
+                ga = GA.GA(hyperparameterss, total_weights, nn1)
+                pso = PSO.PSO(layers, hyperparametersss, nn2)
                 learning_rate = 3
                 momentum = 0 
                 VNN = VideoNN.NeuralNetworks(input_size, hidden_layers, regression, output_size,learning_rate,momentum)
@@ -284,10 +289,13 @@ def main():
 
 
 
+
+
                 bestSolution = de.bestChromie.getchromie()
                 bestWeights = de.nn.weight_transform(bestSolution)
                 de.nn.weights = bestWeights
 
+                
 
 
                 Estimation_Values = de.nn.classify(test_data,test_labels)
