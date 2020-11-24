@@ -4,12 +4,12 @@ def average_every_3():
     # data_sets = ["soybean", "glass", "abalone","cancer","fire", "machine"] 
 
     # for data_set in data_sets:
-    filename = "./finalTuningResults/PSO_tuning_abalone.csv"
+    filename = "/home/matteo/repos/MachineLearning/Project_4/experimental_results/PSO_results.csv"
     df = pd.read_csv(filename)
     l = []
     base = 0
     for i in range(len(df)):
-        mod = 5
+        mod = 10
         if i % mod == 0: base = i
         av = 0
         for j in range(mod):
@@ -17,7 +17,7 @@ def average_every_3():
             av += cell
         av = av/mod
         l.append(av)
-    df['average'] = l
+    df['average2'] = l
     df.to_csv(filename, index=False)
 
 average_every_3()
