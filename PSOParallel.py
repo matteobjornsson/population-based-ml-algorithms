@@ -470,6 +470,7 @@ if __name__ == '__main__':
                                                     break
                                             except:
                                                 # in the case that a line is unexpected text, skip just that line in the csv
+                                                print("csv check: row not recognized")
                                                 continue
                                         # if the current set of hyperparameters was found in the csv, skip will be true, so skip this hyperparameter set
                                         if skip:
