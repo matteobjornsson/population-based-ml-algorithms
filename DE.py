@@ -149,7 +149,7 @@ class DE:
                     #No crossover 
                     continue 
             print("CALCULATE THE FITNESS OF THE NEW CHROMOSOME")
-            fitness = self.fitness(temp)
+            fitness = self.printfitness(temp)
             print(fitness)
             # self.particle_plots[i].append(fitness)
             print("IF THE FITNESS IS BETTER SET THE MEMBER OF THE POPULATIONS CHROMOSOME TO THE NEW CHROMOSOME ")

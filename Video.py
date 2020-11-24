@@ -9,6 +9,7 @@ import DE
 import GA 
 import PSO 
 import VideoNN
+import time 
 
 
 
@@ -240,31 +241,31 @@ def main():
                 counter = 0 
                 print("DE OPERATIONS ")
                 for gen in range(de.maxgens): 
-                    if counter == 10: 
+                    if counter == 1: 
                         break 
                     print("MUTATE AND CROSS OVER ")
-                    de.mutate_and_crossover()
+                    de.Pmutate_and_crossover()
                     counter = counter+1 
                 
                 counter = 0 
                 print("GA OPERATIONS")
-                for gen in range(ga.maxgens): 
-                    if counter == 10: 
+                for gen in range(ga.maxGen): 
+                    if counter == 1: 
                         break 
                     print()
-                    ga.fitness()
-                    ga.selection()
-                    ga.crossover()
+                    ga.pfitness()
+                    ga.Pselection()
+                    ga.Pcrossover()
                     counter = counter + 1 
 
                 counter = 0 
                 print("PSO OPERATIONS")
                 for epoch in range(pso.max_t):
-                    if counter == 10: 
+                    if counter == 1: 
                         break 
-                    pso.update_fitness()
-                    pso.update_position_and_velocity()
-                    counter = count + 1 
+                    pso.Pupdate_fitness()
+                    pso.Pupdate_position_and_velocity()
+                    counter = counter + 1 
 
                    # plt.plot(list(range(len(de.globalbest))), de.globalbest)
                    # plt.draw()
@@ -323,6 +324,8 @@ def main():
                 print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
                 data_set_counter += 1
                 total_counter += 1
+                print("DEMO FINISHED")
+                time.sleep(10000)
 
     print("Program End ")
 
