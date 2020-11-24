@@ -246,7 +246,7 @@ def main():
                     print("MUTATE AND CROSS OVER ")
                     de.Pmutate_and_crossover()
                     counter = counter+1 
-                
+                time.sleep(200)
                 counter = 0 
                 print("GA OPERATIONS")
                 for gen in range(ga.maxGen): 
@@ -257,7 +257,7 @@ def main():
                     ga.Pselection()
                     ga.Pcrossover()
                     counter = counter + 1 
-
+                time.sleep(200)
                 counter = 0 
                 print("PSO OPERATIONS")
                 for epoch in range(pso.max_t):
@@ -266,7 +266,7 @@ def main():
                     pso.Pupdate_fitness()
                     pso.Pupdate_position_and_velocity()
                     counter = counter + 1 
-
+                time.sleep(200)
                    # plt.plot(list(range(len(de.globalbest))), de.globalbest)
                    # plt.draw()
                    # plt.pause(0.00001)
