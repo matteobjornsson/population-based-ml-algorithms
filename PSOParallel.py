@@ -157,11 +157,9 @@ def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: D
 
         # initi PSO and train it
         pso = PSO(layers, hyper_params, nn, maxIter)
-        print("Job ", count, " PSO initialized. Hyperparameters:\n", hyper_params)
         for epoch in range(pso.max_t):
             pso.update_fitness()
             pso.update_position_and_velocity()
-            print("Job ", count, "generation ", epoch)
         
         # get best overall solution and set the NN weights
         bestSolution = pso.gbest_position
@@ -250,7 +248,7 @@ def data_writer(q, filename):
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "maxIter", "loss1", "loss2"]
-    filename = 'PSO_tuning_take2.csv'
+    filename = 'PSO_tuning_abalone.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
