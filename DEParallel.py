@@ -209,12 +209,12 @@ def data_writer(q, filename):
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
-    filename = 'DE_tuning_take2.csv'
+    filename = 'DE_results.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
 
-    data_sets = ["soybean", "glass", "abalone","Cancer","forestfires", "machine"] 
+    data_sets = ["soybean", "glass","Cancer","forestfires", "machine", "abalone"] 
 
     regression_data_set = {
         "soybean": False,
@@ -235,117 +235,99 @@ if __name__ == '__main__':
 
     tuned_0_hl = {
         "soybean": {
-            "omega": .5,
-            "c1": .1,
-            "c2": 5,
+            "beta": .8,
+            "cr": .1,
             "hidden_layer": []
         },
         "Cancer": {
-            "omega": .5,
-            "c1": .5,
-            "c2": 5,
+            "beta": .5,
+            "cr": .8,
             "hidden_layer": []
         },
         "glass": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "beta": .2,
+            "cr": .1,
             "hidden_layer": []
         },
         "forestfires": {
-            "omega": .2,
-            "c1": 5,
-            "c2": .5,
+            "beta": .2,
+            "cr": .1,
             "hidden_layer": []
         },
         "machine": {
-            "omega": .5,
-            "c1": .9,
-            "c2": 5,
+            "beta": .2,
+            "cr": .3,
             "hidden_layer": []
         },
         "abalone": {
-            "omega": .2,
-            "c1": 5,
-            "c2": .9,
+            "beta": .5,
+            "cr": .8,
             "hidden_layer": []
         }
     }
 
     tuned_1_hl = {
         "soybean": {
-            "omega": .5,
-            "c1": .5,
-            "c2": 1,
+            "beta": .2,
+            "cr": .8,
             "hidden_layer": [7]
         },
         "Cancer": {
-            "omega": .2,
-            "c1": .5,
-            "c2": 5,
+            "beta": .8,
+            "cr": .3,
             "hidden_layer": [4]
         },
         "glass": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "beta": .2,
+            "cr": .8,
             "hidden_layer": [8]
         },
         "forestfires": {
-            "omega": .2,
-            "c1": 5,
-            "c2": 5,
+            "beta": .2,
+            "cr": .3,
             "hidden_layer": [8]
         },
         "machine": {
-            "omega": .5,
-            "c1": 5,
-            "c2": .5,
+            "beta": .2,
+            "cr": .8,
             "hidden_layer": [4]
         },
         "abalone": {
-            "omega": .2,
-            "c1": .1,
-            "c2": 5,
+            "beta": .2,
+            "cr": .8,
             "hidden_layer": [8]
         }
     }
 
     tuned_2_hl = {
         "soybean": {
-            "omega": .5,
-            "c1": .9,
-            "c2": .1,
+            "beta": .8,
+            "cr": .8,
             "hidden_layer": [7,12]
         },
         "Cancer": {
-            "omega": .2,
-            "c1": .5,
-            "c2": 5,
+            "beta": .8,
+            "cr": .1,
             "hidden_layer": [4,4]
         },
         "glass": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "beta": .5,
+            "cr": .1,
             "hidden_layer": [8,6]
         },
         "forestfires": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "beta": .8,
+            "cr": .1,
             "hidden_layer": [8,8]
         },
         "machine": {
-            "omega": .2,
-            "c1": .9,
-            "c2": .1,
+            "beta": .2,
+            "cr": .8,
             "hidden_layer": [7,2]
         },
         "abalone": {
-            "omega": .2,
-            "c1": 5,
-            "c2": 5,
+            "beta": .2,
+            "cr": .8,
             "hidden_layer": [6,8]
         }
     }
@@ -372,63 +354,51 @@ if __name__ == '__main__':
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(3):
+        for j in range(10):
             data_package = generate_data_package(fold=j, tenfolds=tenfold_data_and_labels, regression=regression, du=du)
 
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
-                popss =[100] # paper suggests 10 * total weight
-                bet = [.5,.8,.2] # note suggested from paper: [.5 , 1]
-                cr = [.1, .3, .8] # note suggested from paper: cr from [0,.3], [.8, 1] if not converging
-                maxgen = [500]
+                # popss =[100] # paper suggests 10 * total weight
+                # bet = [.5,.8,.2] # note suggested from paper: [.5 , 1]
+                # cr = [.1, .3, .8] # note suggested from paper: cr from [0,.3], [.8, 1] if not converging
+                # maxgen = [500]
 
-                total_trials = 486
-                """
+                # total_trials = 486
                 
-                                hyperparameters = {
-                                    "population_size": 10*total_weights,
-                                    "beta": .5,
-                                    "crossover_rate": .6, 
-                                    "max_gen": 100                                              
-                                    }
-                """
-                for a in popss: 
-                    for b in bet:
-                        for c in cr: 
-                            for d in maxgen: 
-                                hyperparameters = {
-                                    "population_size": a,
-                                    "beta": b,
-                                    "crossover_rate": c, 
-                                    "max_gen": d                                          
-                                    }
-                                # def driver(
-                                #   q, 
-                                #   ds: str, 
-                                #   data_package: list,     
-                                #   regression: bool, 
-                                #   perf: Performance, 
-                                #   hidden_layers: list, 
-                                #   hyper_params: dict, 
-                                #   count: int, 
-                                #   total_counter:int, 
-                                #   total: int):
+                hyperparameters = {
+                    "population_size": 500,
+                    "beta": tuned_parameters[z]["beta"],
+                    "crossover_rate": tuned_parameters[z]["cr"], 
+                    "max_gen": 500                                              
+                    }
+                # for a in popss: 
+                #     for b in bet:
+                #         for c in cr: 
+                #             for d in maxgen: 
+                #                 hyperparameters = {
+                #                     "population_size": a,
+                #                     "beta": b,
+                #                     "crossover_rate": c, 
+                #                     "max_gen": d                                          
+                #                     }
 
-                                pool.apply_async(driver, args=(
-                                    q, # queue
-                                    data_set, 
-                                    data_package,
-                                    regression,
-                                    Per,
-                                    hidden_layers,
-                                    hyperparameters,
-                                    data_set_counter,
-                                    total_counter,
-                                    total_trials
-                                ))
-                                data_set_counter += 1
-                                total_counter += 1
+
+                pool.apply_async(driver, args=(
+                    q, # queue
+                    data_set, 
+                    data_package,
+                    regression,
+                    Per,
+                    hidden_layers,
+                    hyperparameters,
+                    data_set_counter,
+                    total_counter,
+                    total_trials
+                ))
+                data_set_counter += 1
+                total_counter += 1
 
     ##############################
     # CLOSE THE MULTIPROCESS POOL
