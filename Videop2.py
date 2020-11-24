@@ -1,0 +1,1 @@
+#Just show the average of the ten runs and the first bullet point 

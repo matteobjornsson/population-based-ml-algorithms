@@ -122,6 +122,36 @@ class PSO:
             # update the new velocity and position
             p.velocity = new_v
             p.position += new_v
+    def Pupdate_position_and_velocity(self):
+        # iterate over each particle
+            # update v and x using equations from class
+            # x_(t+1) = x_t + v_(t+1)
+            # v_(t+1) = w*v_t + c1*r1*(pb_t - x_t) + c2*r2*(gb_t - x_t)
+        # use velocity clamping on v_max
+        for p in self.population:
+            # assign variables to improve readability
+            v = p.velocity
+            w = self.omega
+            c1 = self.c1
+            r1 = random.uniform(0,1)
+            c2 = self.c2
+            r2 = random.uniform(0,1)
+            pb = p.pbest_position
+            gb = self.gbest_position
+            x = p.position
+
+            # calculate the new velocity
+            new_v = w*v + c1*r1*(pb - x) + c2*r2*(gb - x)
+
+            # clamp velocity to vmax if greater than vmax or less than -vmax.
+            # these two lines use numpy functions to select values for which the 
+            # conditional is true and set them to vmax
+            new_v[new_v > self.vmax] = self.vmax
+            new_v[new_v < -self.vmax] = -self.vmax
+
+            # update the new velocity and position
+            p.velocity = new_v
+            p.position += new_v
 
     ########################################
     # Evaluate the fitness of an individual
@@ -150,13 +180,32 @@ class PSO:
         # track global best over time each iteration
         self.fitness_plot.append(self.gbest_fitness)
 
+    ########################################
+    # Evaluate the fitness of an individual
+    ########################################
+    def Pupdate_fitness(self) -> None:
+    # for all particles, this method applies the individual's weights to the NN, 
+    # feeds data set through and sets the fitness to the error of forward pass
+        index = 0
+        for p in self.population:
+            # run the dataset through the NN with the particle's weights to get fitness
+            fitness = self.NN.fitness(p.position)
+            # update personal best
+            if p.pbest_fitness > fitness:
+                p.pbest_fitness = fitness
+                p.pbest_position = p.position
+            # update global best
+            if self.gbest_fitness > fitness:
+                self.gbest_fitness = fitness
+                self.gbest_position = p.position
+            # update particle fitness
+            p.fitness = fitness
 
-    ####################################
-    # driver method
-    ####################################
-    # initialize
-    # until convergence of global best:
-        # update V and X for each swarm memeber and eval fitness
+            self.particle_plots[index].append(p.fitness)
+            index += 1
+
+        # track global best over time each iteration
+        self.fitness_plot.append(self.gbest_fitness)
 
 if __name__ == '__main__':
 

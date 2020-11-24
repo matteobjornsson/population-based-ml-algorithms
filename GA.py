@@ -111,6 +111,17 @@ class GA:
         for i in self.population:  
             fitscore = self.nn.fitness(i.getChromie()) 
             i.setfit(fitscore)
+    
+        ########################################
+    # Evaluate the fitness of an individual
+    ########################################
+    def pfitness(self,) -> float:
+        print("FITNESS")
+        #Fitness Function will be Mean squared Error
+        for i in self.population:  
+            fitscore = self.nn.fitness(i.getChromie()) 
+            print(fitscore)
+            i.setfit(fitscore)
             
 
     ##################################
@@ -139,6 +150,40 @@ class GA:
                     break
 
         self.population = newPopulation
+
+        ##################################
+    # pick a subset of POP based on fitness OR some sort of random or ranked selection
+    #####################################
+    def Pselection(self):
+        print("SELECTION")
+        self.population = sorted(self.population, key=lambda individual: individual.fitness)
+        bestChromie = self.population[0]
+        self.globalfit.append(bestChromie.fitness)
+        if bestChromie.fitness < self.bestChromie.fitness:
+            self.bestChromie = bestChromie
+        pop = self.pop_size
+
+        #  RANKED ROULETTE SELECTION
+        newPopulation = list()
+        Subset = int(pop / 2 )
+        Subset = Subset + 1 
+        for j in range(Subset): 
+            choice = random.random()
+            print("RANDOM CHOICE")
+            print(choice)
+            sum = 0
+            for i in range(pop):
+                sum += 2/pop * (pop - (i+1))/(pop - 1)
+                print("Chromosome picked")
+                print(sum)
+                if sum > choice:
+                    print("Parent selected")
+                    print(self.population[i])
+                    newPopulation.append(self.population[i])
+                    break
+
+        self.population = newPopulation
+
 
 
     ####################################
@@ -190,6 +235,61 @@ class GA:
             self.population.remove(self.population[Kill])
         self.mutate()
 
+
+        ####################################
+    # make new generation based on parent selection by swapping chromosomes 
+    ####################################
+    def Pcrossover(self): 
+        print("CROSS OVER ")
+        self.generation = self.generation + 1
+        NewPop = list() 
+        for i in range(len(self.population)-1): 
+
+            NewChromoC1 = list()
+            NewChromoC2 = list()  
+            print("PICKING PARENTS")
+            Parent1 = self.population[i]
+            Parent2 = self.population[i+1]
+            print("CREATING 2 NEW CHILDREN ")
+            Child1 = individual()
+            Child2 = individual()
+            
+            Child1.InitChromie(Parent1.getsize())
+            Child2.InitChromie(Parent2.getsize())
+            
+            for i in range(Parent1.getsize()):
+                score = random.random()
+                if score > self.crossover_rate: 
+                    bit = Parent1.getChromie()
+                    bit = bit[i]
+                    bit2 = Parent2.getChromie()
+                    bit2 = bit2[i]
+                else: 
+                    bit = Parent2.getChromie()
+                    bit = bit[i]
+                    bit2 = Parent1.getChromie()
+                    bit2 = bit2[i]
+                NewChromoC1.append(bit)
+                NewChromoC2.append(bit2)
+            print("NEW CHILDRENS CHROMOSOMES")
+            print("Child1 ")
+            print(NewChromoC1)
+            print("Child 2 ")
+            print(NewChromoC2)
+            NewChromoC1 = np.array(NewChromoC1)
+            NewChromoC2 = np.array(NewChromoC2)
+            Child1.SetChromie(NewChromoC1)
+            Child2.SetChromie(NewChromoC2)
+            NewPop.append(Child1)
+            NewPop.append(Child2)
+        self.population = NewPop
+        
+        while(len(self.population) > self.pop_size): 
+            Kill = random.randint(0,len(self.population))
+            self.population.remove(self.population[Kill])
+        self.mutate()
+
+
     ###################################
     # introduce random change to each individual in the generation
     ###############################
@@ -203,20 +303,24 @@ class GA:
                 temp = i.getChromie()
                 temp[bit] = random.uniform(-self.mutation_range,self.mutation_range)
                 i.SetChromie(temp)  
-
-##################################
-# Main function down here? 
-# Remember, functions we can dispatch as jobs with unique parameters = parallelizeable. 
-#################################
-    def driver(input_parameters): 
-        # Until convergence: 
-            # select individuals from pop to mate
-            # crossover
-            # mutate
-            # evaluate fitness of new individuals
-            # replace existing population
-        pass
-
+        ###################################
+    # introduce random change to each individual in the generation
+    ###############################
+    def Pmutate(self):
+        print("MUTATION")
+        for i in self.population:
+            perc = random.random()
+            if perc > self.mutation_rate: 
+                print("NO MUTATION ")
+                continue 
+            else: 
+                print("MUTATION")
+                bit = random.randint(0,len(i.getChromie())-1)
+                temp = i.getChromie()
+                temp[bit] = random.uniform(-self.mutation_range,self.mutation_range)
+                print("NEW CHROMOSOME")
+                print(temp )
+                i.SetChromie(temp)  
 
 
 if __name__ == '__main__':
