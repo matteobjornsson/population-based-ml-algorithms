@@ -12,12 +12,32 @@ import PSO
 import VideoNN
 import time 
 
-
+# this function batches data for training the NN, batch size is thie important input parmameter
+def batch_input_data(X: np.ndarray, labels: np.ndarray, batch_size: int) -> list:
+    batches = []
+    # grabs indices of all data points to train on
+    data_point_indices = list(range(X.shape[1]))
+    # shuffles them
+    random.shuffle(data_point_indices)
+    # print(data_point_indices)
+    # then batches them in a list of [batch, batch labels] pairs
+    for i in range(math.ceil(X.shape[1]/batch_size)):
+        if i == math.ceil(X.shape[1]/batch_size) - 1:
+            batch_indices = data_point_indices
+        else:
+            batch_indices = data_point_indices[:batch_size]
+            data_point_indices = data_point_indices[batch_size:]
+        # print(batch_indices)
+        # batch indices is an array, selecting all columns of indices in that array
+        X_i = X[:, batch_indices]
+        labels_i = labels[:, batch_indices]
+        batches.append([X_i, labels_i])
+    return batches
 
 def main(): 
     print("Program Start")
     headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
-    filename = 'DE_experimental_resultsFINAL.csv'
+    filename = 'VIDEORESULTS.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
@@ -196,7 +216,7 @@ def main():
             data_set_size = X.shape[1] + test_data.shape[1]
 
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
-            for z in range(3):
+            for z in range(1):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
                 layers = [input_size] + hidden_layers + [output_size]
@@ -240,7 +260,7 @@ def main():
                 learning_rate = 3
                 momentum = 0 
                 VNN = VideoNN.NeuralNetworks(input_size, hidden_layers, regression, output_size,learning_rate,momentum)
-
+                VNN.set_input_data(X,labels)
                  
                 for gen in range(de.maxgens): 
                     de.mutate_and_crossover()
@@ -256,35 +276,37 @@ def main():
                 for epoch in range(pso.max_t):
                     pso.update_fitness()
                     pso.update_position_and_velocity()
-
                 
-                   # plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                   # plt.draw()
-                   # plt.pause(0.00001)
-                    #plt.clf()
-                # get the best overall solution and set the NN to those weights
-                #DE
+
+                for epoch in range(100):
+                    VNN.forward_pass()
+                    VNN.backpropagation_pass()
+
+
+
                 bestSolution = de.bestChromie.getchromie()
                 bestWeights = de.nn.weight_transform(bestSolution)
                 de.nn.weights = bestWeights
-                #GA
 
 
-                #PS
 
-
-                #   ################################ new code for de end ###################################
-                # plt.ioff()
-                # plt.plot(list(range(len(de.globalbest))), de.globalbest)
-                # plt.show()
-                # img_name = data_set + '_l' + str(len(hidden_layers)) + '_pr' + str(a) + '_vr' + str(b) + '_w' + str(c) + '_c' + str(d) + '_cc' + str(e) + '_v' + str(f) + '_ps' + str(g) + '.png'
-                # plt.savefig('tuning_plots/' + img_name)
-                # plt.clf()
                 Estimation_Values = de.nn.classify(test_data,test_labels)
+                Estimation_Values1 = ga.nn.classifiy(test_data,test_labels)
+                Estimation_Values2 = pso.nn.classify(test_data,test_labels)
+                Estimation_Values3 = VNN.classify(test_data,test_labels)
                 if regression == False: 
                     #Decode the One Hot encoding Value 
                     Estimation_Values = de.nn.PickLargest(Estimation_Values)
                     test_labels_list = de.nn.PickLargest(test_labels)
+                    Estimation_Values1 = ga.nn.PickLargest(Estimation_Values1)
+                    Tll = ga.nn.PickLargest(test_labels)
+                    Estimation_Values2 = pso.nn.PickLargest(Estimation_Values2)
+                    tll1 = pso.nn.PickLargest(test_labels)
+                    Estimation_Values3 = VNN.classify(Estimation_Values3)
+                    tll = VNN.PickLargest(test_labels)
+
+
+
                     # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
                     # print(Estimation_Values)
                 else: 
@@ -297,6 +319,14 @@ def main():
                 
 
                 Nice = Per.ConvertResultsDataStructure(groun, Estimat)
+                Nice1 = Per.ConvertResultsDataStructure(Tll, Estimatation_Values1)
+                Nice2 = Per.ConvertResultsDataStructure(tll1, Estimatation_Values2)
+                Nice3 = Per.ConvertResultsDataStructure(tll, Estimatation_Values3)
+                DEss = per.StartLossFunction(regression,Nice)
+                GAss = per.StartLossFunction(regression,Nice1)
+                PSOSS = per.StartLossFunction(regression,Nice2)
+                VNNS = per.StartLossFunction(regression,Nice3)
+
                 # print("THE GROUND VERSUS ESTIMATION:")
                 # print(Nice)
             
@@ -312,11 +342,8 @@ def main():
                     ]
 
                 Per.StartLossFunction(regression, Nice, Meta, filename)
-                print(f"{data_set_counter}/30 {data_set}. {total_counter}/180")
                 data_set_counter += 1
                 total_counter += 1
-                print("DEMO FINISHED")
-                time.sleep(10000)
 
     print("Program End ")
 
