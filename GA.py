@@ -287,7 +287,7 @@ class GA:
         while(len(self.population) > self.pop_size): 
             Kill = random.randint(0,len(self.population))
             self.population.remove(self.population[Kill])
-        self.mutate()
+        self.Pmutate()
 
 
     ###################################

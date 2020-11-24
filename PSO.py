@@ -123,6 +123,7 @@ class PSO:
             p.velocity = new_v
             p.position += new_v
     def Pupdate_position_and_velocity(self):
+        print("POSITION AND VELOCITY AND UPDATE ")
         # iterate over each particle
             # update v and x using equations from class
             # x_(t+1) = x_t + v_(t+1)
@@ -142,7 +143,11 @@ class PSO:
 
             # calculate the new velocity
             new_v = w*v + c1*r1*(pb - x) + c2*r2*(gb - x)
-
+            print("NEW VELOCITY")
+            print("Equation used")
+            print("w*v + c1*r1*(pb - x) + c2*r2*(gb - x)")
+            print(new_v)
+           
             # clamp velocity to vmax if greater than vmax or less than -vmax.
             # these two lines use numpy functions to select values for which the 
             # conditional is true and set them to vmax
@@ -152,6 +157,8 @@ class PSO:
             # update the new velocity and position
             p.velocity = new_v
             p.position += new_v
+            print("NEW POSITION")
+            print(p.position)
 
     ########################################
     # Evaluate the fitness of an individual
@@ -184,6 +191,7 @@ class PSO:
     # Evaluate the fitness of an individual
     ########################################
     def Pupdate_fitness(self) -> None:
+        print("UPDATE FITNESS")
     # for all particles, this method applies the individual's weights to the NN, 
     # feeds data set through and sets the fitness to the error of forward pass
         index = 0
@@ -198,9 +206,12 @@ class PSO:
             if self.gbest_fitness > fitness:
                 self.gbest_fitness = fitness
                 self.gbest_position = p.position
+            print("NEW GLOBAL BEST ")
+            print(self.gbest_fitness)
             # update particle fitness
             p.fitness = fitness
-
+            print("NEW FITNESS")
+            print(p.fitness)
             self.particle_plots[index].append(p.fitness)
             index += 1
 
