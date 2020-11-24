@@ -423,7 +423,7 @@ if __name__ == '__main__':
                 c1 = [.1, .5, .9, 3]
                 c2 = [.1, .5, .9, 3]
                 vmax = [1]
-                pop_size = [1000]
+                pop_size = [100]
                 max_iter = [500]
                 for a in omega:
                     for b in c1:
