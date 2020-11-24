@@ -4,7 +4,7 @@ def average_every_3():
     # data_sets = ["soybean", "glass", "abalone","cancer","fire", "machine"] 
 
     # for data_set in data_sets:
-    filename = "GA_tuning_resultsFINAL.csv"
+    filename = "DE_tuning_take2.csv"
     df = pd.read_csv(filename)
     l = []
     base = 0
@@ -18,7 +18,7 @@ def average_every_3():
         av = av/mod
         l.append(av)
     df['average'] = l
-    df.to_csv("GA_tuning_resultsFINALav.csv", index=False)
+    df.to_csv("DE_tuning_abalone_av.csv", index=False)
 
 average_every_3()
 # def fix_soybean():
