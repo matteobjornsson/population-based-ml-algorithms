@@ -254,13 +254,13 @@ def driver(q, ds: str, data_package: list, regression: bool, perf: Performance, 
         # headers = ["Data set", "layers", "pop", "Beta", "CR", "generations", "loss1", "loss2"]
 
         Meta = [
-            data_set, 
+            ds, 
             len(hidden_layers), 
-            hyperparameters["maxGen"], 
-            hyperparameters["pop_size"], 
-            hyperparameters["mutation_rate"],
-            hyperparameters["mutation_range"],
-            hyperparameters["crossover_rate"]
+            hyper_params["maxGen"], 
+            hyper_params["pop_size"], 
+            hyper_params["mutation_rate"],
+            hyper_params["mutation_range"],
+            hyper_params["crossover_rate"]
             ]
         results_performance = perf.LossFunctionPerformance(regression, results) 
         data_point = Meta + results_performance
