@@ -254,7 +254,7 @@ if __name__ == '__main__':
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
 
-    data_sets = ["soybean", "glass", "abalone","Cancer","forestfires", "machine"] 
+    data_sets = ["soybean", "glass","Cancer","forestfires", "machine", "abalone"] 
 
     regression_data_set = {
         "soybean": False,
@@ -275,117 +275,117 @@ if __name__ == '__main__':
 
     tuned_0_hl = {
         "soybean": {
-            "omega": .5,
-            "c1": .1,
-            "c2": 5,
+            "omega": .4,
+            "c1": 3,
+            "c2": 3,
             "hidden_layer": []
         },
         "Cancer": {
-            "omega": .5,
-            "c1": .5,
-            "c2": 5,
+            "omega": .1,
+            "c1": 3,
+            "c2": .9,
             "hidden_layer": []
         },
         "glass": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "omega": .1,
+            "c1": .5,
+            "c2": 3,
             "hidden_layer": []
         },
         "forestfires": {
-            "omega": .2,
-            "c1": 5,
+            "omega": .4,
+            "c1": .5,
             "c2": .5,
             "hidden_layer": []
         },
         "machine": {
-            "omega": .5,
-            "c1": .9,
-            "c2": 5,
+            "omega": .4,
+            "c1": 3,
+            "c2": .9,
             "hidden_layer": []
         },
         "abalone": {
-            "omega": .2,
-            "c1": 5,
-            "c2": .9,
+            "omega": .1,
+            "c1": .9,
+            "c2": 3,
             "hidden_layer": []
         }
     }
 
     tuned_1_hl = {
         "soybean": {
-            "omega": .5,
-            "c1": .5,
-            "c2": 1,
+            "omega": .4,
+            "c1": 3,
+            "c2": 3,
             "hidden_layer": [7]
         },
         "Cancer": {
-            "omega": .2,
-            "c1": .5,
-            "c2": 5,
+            "omega": .4,
+            "c1": .9,
+            "c2": .1,
             "hidden_layer": [4]
         },
         "glass": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "omega": .1,
+            "c1": 3,
+            "c2": 3,
             "hidden_layer": [8]
         },
         "forestfires": {
-            "omega": .2,
-            "c1": 5,
-            "c2": 5,
+            "omega": .1,
+            "c1": .5,
+            "c2": .1,
             "hidden_layer": [8]
         },
         "machine": {
-            "omega": .5,
-            "c1": 5,
-            "c2": .5,
+            "omega": .1,
+            "c1": 3,
+            "c2": 3,
             "hidden_layer": [4]
         },
         "abalone": {
-            "omega": .2,
+            "omega": .1,
             "c1": .1,
-            "c2": 5,
+            "c2": 3,
             "hidden_layer": [8]
         }
     }
 
     tuned_2_hl = {
         "soybean": {
-            "omega": .5,
+            "omega": .4,
             "c1": .9,
-            "c2": .1,
+            "c2": 3,
             "hidden_layer": [7,12]
         },
         "Cancer": {
-            "omega": .2,
-            "c1": .5,
-            "c2": 5,
+            "omega": .4,
+            "c1": 3,
+            "c2": .5,
             "hidden_layer": [4,4]
         },
         "glass": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "omega": .1,
+            "c1": .1,
+            "c2": 3,
             "hidden_layer": [8,6]
         },
         "forestfires": {
-            "omega": .2,
-            "c1": .9,
-            "c2": 5,
+            "omega": .1,
+            "c1": .1,
+            "c2": .1,
             "hidden_layer": [8,8]
         },
         "machine": {
-            "omega": .2,
-            "c1": .9,
-            "c2": .1,
+            "omega": .1,
+            "c1": .5,
+            "c2": 3,
             "hidden_layer": [7,2]
         },
         "abalone": {
-            "omega": .2,
-            "c1": 5,
-            "c2": 5,
+            "omega": .1,
+            "c1": .9,
+            "c2": 3,
             "hidden_layer": [6,8]
         }
     }
@@ -405,7 +405,7 @@ if __name__ == '__main__':
 
     total_counter = 0
     for data_set in data_sets:
-        if data_set != "abalone": continue
+
         regression = regression_data_set[data_set]
         tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
 
@@ -414,84 +414,85 @@ if __name__ == '__main__':
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
-        for j in range(3):
+        for j in range(10):
             data_package = generate_data_package(fold=j, tenfolds=tenfold_data_and_labels, regression=regression, du=du)
 
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
-                omega = [.1, .4]
-                c1 = [.1, .5, .9, 3]
-                c2 = [.1, .5, .9, 3]
-                vmax = [1]
-                pop_size = [100]
-                max_iter = [500]
-                total_trials = 972
+                # omega = [.1, .4]
+                # c1 = [.1, .5, .9, 3]
+                # c2 = [.1, .5, .9, 3]
+                # vmax = [1]
+                # pop_size = [100]
+                # max_iter = [500]
+                total_trials = 180
 
-                for a in omega:
-                    for b in c1:
-                        for c in c2:
-                            for d in vmax:
-                                for e in pop_size:
-                                    for f in max_iter:
-                                        hyperparameters = {
-                                            "position_range": 10,
-                                            "velocity_range": 1,
-                                            "omega": a,
-                                            "c1": b,
-                                            "c2": c,
-                                            "vmax": d,
-                                            "pop_size": e,
-                                            "max_iter": f                                              
-                                            }
-                                        # check if we have already done this hyperparameter set:
-                                        skip = False
-                                        for i in range(len(previous_trials)):
-                                            try:
-                                                # try to pick out all variables
-                                                v_data_set = str(previous_trials['Data set'][i])
-                                                v_omega = float(previous_trials['omega'][i])
-                                                v_c1 = float(previous_trials['c1'][i])
-                                                v_c2 = float(previous_trials['c2'][i])
-                                                v_vmax = float(previous_trials['vmax'][i])
-                                                v_pop = float(previous_trials['pop_size'][i])
-                                                v_max_iter = float(previous_trials['maxIter'][i])
-                                                # check if the current hyperparameter set already exists in the csv
-                                                if (
-                                                    data_set == v_data_set and 
-                                                    v_omega == a and
-                                                    v_c1 == b and
-                                                    v_c2 == c and
-                                                    v_vmax == d and
-                                                    v_pop == e and
-                                                    v_max_iter == f):
-                                                    # if it exists in the csv, then set the skip flag to true
-                                                    skip = True
-                                                    break
-                                            except:
-                                                # in the case that a line is unexpected text, skip just that line in the csv
-                                                print("csv check: row not recognized")
-                                                continue
-                                        # if the current set of hyperparameters was found in the csv, skip will be true, so skip this hyperparameter set
-                                        if skip:
-                                            continue
+                # for a in omega:
+                #     for b in c1:
+                #         for c in c2:
+                #             for d in vmax:
+                #                 for e in pop_size:
+                #                     for f in max_iter:
+                hyperparameters = {
+                    "position_range": 10,
+                    "velocity_range": 1,
+                    "omega": tuned_parameters[z]["omega"],
+                    "c1": tuned_parameters[z]["c1"],
+                    "c2": tuned_parameters[z]["c2"],
+                    "vmax": 1,
+                    "pop_size": 1000,
+                    "max_iter": 500                                              
+                    }
+                if data_set == "abalone": hyperparameters["pop_size"] = 100
+                # # check if we have already done this hyperparameter set:
+                # skip = False
+                # for i in range(len(previous_trials)):
+                #     try:
+                #         # try to pick out all variables
+                #         v_data_set = str(previous_trials['Data set'][i])
+                #         v_omega = float(previous_trials['omega'][i])
+                #         v_c1 = float(previous_trials['c1'][i])
+                #         v_c2 = float(previous_trials['c2'][i])
+                #         v_vmax = float(previous_trials['vmax'][i])
+                #         v_pop = float(previous_trials['pop_size'][i])
+                #         v_max_iter = float(previous_trials['maxIter'][i])
+                #         # check if the current hyperparameter set already exists in the csv
+                #         if (
+                #             data_set == v_data_set and 
+                #             v_omega == a and
+                #             v_c1 == b and
+                #             v_c2 == c and
+                #             v_vmax == d and
+                #             v_pop == e and
+                #             v_max_iter == f):
+                #             # if it exists in the csv, then set the skip flag to true
+                #             skip = True
+                #             break
+                #     except:
+                #         # in the case that a line is unexpected text, skip just that line in the csv
+                #         print("csv check: row not recognized")
+                #         continue
+                # # if the current set of hyperparameters was found in the csv, skip will be true, so skip this hyperparameter set
+                # if skip:
+                #     continue
 
-                                        pool.apply_async(driver, args=(
-                                            q, # queue
-                                            hyperparameters["max_iter"], # max iter
-                                            data_set, 
-                                            data_package,
-                                            regression,
-                                            du,
-                                            Per,
-                                            hidden_layers,
-                                            hyperparameters,
-                                            data_set_counter,
-                                            total_counter,
-                                            total_trials
-                                        ))
-                                        data_set_counter += 1
-                                        total_counter += 1
+                pool.apply_async(driver, args=(
+                    q, # queue
+                    hyperparameters["max_iter"], # max iter
+                    data_set, 
+                    data_package,
+                    regression,
+                    du,
+                    Per,
+                    hidden_layers,
+                    hyperparameters,
+                    data_set_counter,
+                    total_counter,
+                    total_trials
+                ))
+                data_set_counter += 1
+                total_counter += 1
 
     ##############################
     # CLOSE THE MULTIPROCESS POOL
