@@ -249,7 +249,7 @@ def data_writer(q, filename):
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "maxIter", "loss1", "loss2"]
-    filename = 'PSO_tuning_abalone.csv'
+    filename = 'PSO_results.csv'
 
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
