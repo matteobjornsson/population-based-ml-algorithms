@@ -135,27 +135,39 @@ class GA:
     # pick a subset of POP based on fitness OR some sort of random or ranked selection
     #####################################
     def selection(self):
-
+        #Sort the population based on the fitness function 
         self.population = sorted(self.population, key=lambda individual: individual.fitness)
+        #Set a variable to the most fit member 
         bestChromie = self.population[0]
+        #add this member to the global most fit 
         self.globalfit.append(bestChromie.fitness)
+        #If this new mem is the most for the all of the generations
         if bestChromie.fitness < self.bestChromie.fitness:
+            #Update the best chromosome 
             self.bestChromie = bestChromie
+        #Set the pop size to a local variable 
         pop = self.pop_size
 
         #  RANKED ROULETTE SELECTION
         newPopulation = list()
+        #set a counter for half of the population + 1 to cross over 
         Subset = int(pop / 2 )
         Subset = Subset + 1 
         for j in range(Subset): 
+            #Choose a random value 
             choice = random.random()
+            #Set a sum variable 
             sum = 0
+            #For everyone in the population 
             for i in range(pop):
+                #Find the member in the population that is to be selected from the following equation 
                 sum += 2/pop * (pop - (i+1))/(pop - 1)
+                #if this condition is met then we select this member 
                 if sum > choice:
+                    #add this member to the new population 
                     newPopulation.append(self.population[i])
                     break
-
+        #Set the new population to population list 
         self.population = newPopulation
 
         ##################################
@@ -304,14 +316,23 @@ class GA:
     # introduce random change to each individual in the generation
     ###############################
     def mutate(self):
+        #For everyone in the popliuation s
         for i in self.population:
+            #Roll a random integer value 
             perc = random.random()
+            #If this is higher than the mutation rate do not mutate 
             if perc > self.mutation_rate: 
+                #go to the next 
                 continue 
+            #Otherwise 
             else: 
+                #Randomly mutate a position in the chromsome 
                 bit = random.randint(0,len(i.getChromie())-1)
+                #Set a variable to the chromosome 
                 temp = i.getChromie()
+                #Update the new chromosomes position value 
                 temp[bit] = random.uniform(-self.mutation_range,self.mutation_range)
+                #Update the chromosome 
                 i.SetChromie(temp)  
         ###################################
     # introduce random change to each individual in the generation
