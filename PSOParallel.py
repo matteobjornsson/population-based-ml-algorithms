@@ -441,10 +441,9 @@ if __name__ == '__main__':
                     "c1": tuned_parameters[z]["c1"],
                     "c2": tuned_parameters[z]["c2"],
                     "vmax": 1,
-                    "pop_size": 1000,
+                    "pop_size": 100,
                     "max_iter": 500                                              
                     }
-                if data_set == "abalone": hyperparameters["pop_size"] = 100
                 # # check if we have already done this hyperparameter set:
                 # skip = False
                 # for i in range(len(previous_trials)):
