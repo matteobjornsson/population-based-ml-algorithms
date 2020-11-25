@@ -1,3 +1,10 @@
+# Author: Matteo Bjornsson
+################################################################################
+# This is the parallelized driver for running the PSO experiment. This file 
+# grabs data sets from "./NormalizedData" and for each data set generates 
+# tenfolds, and runs PSO to train each of the 0,1,2 layer neural networks. 
+################################################################################
+
 import random
 import Performance
 from NeuralNetwork import NeuralNetwork
@@ -145,8 +152,26 @@ class PSO:
         # track global best over time each iteration
         self.fitness_plot.append(self.gbest_fitness)
 
-def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: DataUtility, perf: Performance, hidden_layers: list, hyper_params: dict, count: int, total_counter:int, total: int):
+
+# this method is the target for spawning PSO jobs asynchronously. 
+################################################################################
+def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, perf: Performance, hidden_layers: list, hyper_params: dict, count: int, total_counter:int, total: int):
+    '''
+    q: a multiprocessing manager Queue object to pass finished data to
+    maxIter: int. number of epochs to run PSO for
+    ds: string. name of the data set
+    data_package: list. see the data_package method below. Provides all the data needed to run the experiment
+    regression: boolean. Is this a regression task?
+    perf: Performance type object, used to process estimates vs ground truth
+    hidden_layers: list. tells the algorithm how many layers there are in the NN architecture
+    hyper_params: dictionary of hyperparameters. useful for tuning.
+    count: int. the job number for this data set
+    total_counter: int. the job number wrt the total run
+    total: int. the total number of jobs across all data sets. used for progress printing. 
+    '''
+    
     print("Job ", ds, count, "started")
+    # multiprocessor in python supresses exceptions when workers fail. This try catch block forces it to raise an exception and stack trace for debugging. 
     try:
         # init all test data values
         test_data, test_labels, training_data, training_labels, output_size, input_size = data_package
@@ -163,7 +188,7 @@ def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: D
             pso.update_fitness()
             pso.update_position_and_velocity()
         
-        # get best overall solution and set the NN weights
+        # get best overall solution from the PSO and set the NN weights
         bestSolution = pso.gbest_position
         bestWeights = pso.NN.weight_transform(bestSolution)
         pso.NN.weights = bestWeights
@@ -182,31 +207,39 @@ def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: D
             hyper_params["pop_size"],
             hyper_params["max_iter"]
             ]
+        # get the performance of the network w.r.t. the ground truth
         results_performance = perf.LossFunctionPerformance(regression, results) 
+        # construct the data point to be written to disk via csv file
         data_point = Meta + results_performance
         data_point_string = ','.join([str(x) for x in data_point])
         # put the result on the multiprocessing queue
         q.put(data_point_string)
+        # status update
         print(f"{ds} {count}/{int(total/6)}. {total_counter}/{total}")
+
+    # if something goes wrong raise an exception 
     except Exception as e:
         print('Caught exception in worker thread')
 
         # This prints the type, value, and stack trace of the
         # current exception being handled.
         traceback.print_exc()
-
         print()
         raise e
 
+# this method condenses all data preparation for the algorithm
+# returns a list of objects:
+# [test_data, test_labels, training_data, training_labels, output_size, input_size]
+###############################################################
 def generate_data_package(fold: int, tenfolds: list, regression: bool, du: DataUtility):
+    # get the fold we are going to use for testing 
     test_data, test_labels = copy.deepcopy(tenfolds[fold])
+    # squish the rest of the data and ground truth labels into one numpy array, respectively
     remaining_data = [x[0] for i, x in enumerate(copy.deepcopy(tenfolds)) if i!=fold]
     remaining_labels = [y[1] for i, y in enumerate(copy.deepcopy(tenfolds)) if i!=fold]
-    #Store off a set of the remaining dataset 
     training_data = np.concatenate(remaining_data, axis=1) 
-    #Store the remaining data set labels 
     training_labels = np.concatenate(remaining_labels, axis=1)
-    
+    # determine how many output nodes the network has (1 if regression)
     if regression == True:
         #The number of output nodes is 1 
         output_size = 1
@@ -222,6 +255,8 @@ def generate_data_package(fold: int, tenfolds: list, regression: bool, du: DataU
     input_size = training_data.shape[0]
     return [test_data, test_labels, training_data, training_labels, output_size, input_size]
 
+# this method takes in a PSO object, trained neural network, and test data and classifies the test data using the NN.
+# the results returned are the performance loss functions
 def classify(test_data: np.ndarray, test_labels: np.ndarray, regression: bool, pso: PSO, perf: Performance):
     estimates = pso.NN.classify(test_data, test_labels)
     if regression == False: 
@@ -247,11 +282,13 @@ def data_writer(q, filename):
                 break
             f.write(data_string + '\n')
 
+# this is the main function that runs the PSO algorithm and experiment
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "maxIter", "loss1", "loss2"]
     filename = 'PSO_results.csv'
 
+    # prepare the performance object (also used to write results to file)
     Per = Performance.Results()
     Per.PipeToFile([], headers, filename)
 
@@ -274,6 +311,9 @@ if __name__ == '__main__':
         "abalone": []
     }
 
+    ###############################################
+    # TUNED HYPERPARAMETERS
+    ###############################################
     tuned_0_hl = {
         "soybean": {
             "omega": .4,
@@ -405,36 +445,27 @@ if __name__ == '__main__':
     previous_trials = pd.read_csv(filename)
 
     total_counter = 0
+    # iterate over every data set
     for data_set in data_sets:
-
+        # look up if the data set is a regression task
         regression = regression_data_set[data_set]
+        # collect the parameters from above
         tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
 
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
-
+        # once for each of the ten folds
         for j in range(10):
+            # produce the training and test data
             data_package = generate_data_package(fold=j, tenfolds=tenfold_data_and_labels, regression=regression, du=du)
-
+            # once for each number of hidden layers in the network
             for z in range(3):
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
-
-                # omega = [.1, .4]
-                # c1 = [.1, .5, .9, 3]
-                # c2 = [.1, .5, .9, 3]
-                # vmax = [1]
-                # pop_size = [100]
-                # max_iter = [500]
+                # 6 data sets * 10 folds * 3 layers
                 total_trials = 180
 
-                # for a in omega:
-                #     for b in c1:
-                #         for c in c2:
-                #             for d in vmax:
-                #                 for e in pop_size:
-                #                     for f in max_iter:
                 hyperparameters = {
                     "position_range": 10,
                     "velocity_range": 1,
@@ -445,6 +476,9 @@ if __name__ == '__main__':
                     "pop_size": 100,
                     "max_iter": 500                                              
                     }
+                ################################################################
+                # # the following code is used to rescue partially completed runs
+                #
                 # # check if we have already done this hyperparameter set:
                 # skip = False
                 # for i in range(len(previous_trials)):
@@ -476,14 +510,15 @@ if __name__ == '__main__':
                 # # if the current set of hyperparameters was found in the csv, skip will be true, so skip this hyperparameter set
                 # if skip:
                 #     continue
+                #############################################################
 
+                # spawn a PSO instance per fold, data set, and layer
                 pool.apply_async(driver, args=(
                     q, # queue
                     hyperparameters["max_iter"], # max iter
                     data_set, 
                     data_package,
                     regression,
-                    du,
                     Per,
                     hidden_layers,
                     hyperparameters,
