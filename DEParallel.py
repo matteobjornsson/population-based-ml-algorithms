@@ -1,3 +1,7 @@
+# This is the parallelized version of DE.py, written by Nick Stone.
+# Parallelized by Matteo Bjornsson. 
+################################################################################
+
 import random
 import Performance
 from NeuralNetwork import NeuralNetwork
@@ -28,7 +32,6 @@ class individual():
 
 
 class DE:
-    #this is the hyperparameter from mutation
 
     #####################
     # Initialize the population etc
@@ -373,17 +376,7 @@ if __name__ == '__main__':
                     "crossover_rate": tuned_parameters[z]["cr"], 
                     "max_gen": 500                                              
                     }
-                if data_set == "abalone": hyperparameters["population_size"] = 100
-                # for a in popss: 
-                #     for b in bet:
-                #         for c in cr: 
-                #             for d in maxgen: 
-                #                 hyperparameters = {
-                #                     "population_size": a,
-                #                     "beta": b,
-                #                     "crossover_rate": c, 
-                #                     "max_gen": d                                          
-                #                     }
+
 
 
                 pool.apply_async(driver, args=(
