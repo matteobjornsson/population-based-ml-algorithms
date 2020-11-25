@@ -210,49 +210,65 @@ class GA:
     # make new generation based on parent selection by swapping chromosomes 
     ####################################
     def crossover(self): 
+        #Update the generation 
         self.generation = self.generation + 1
+        #Create a temp list 
         NewPop = list() 
-        #{01 12 23 34 }
-        #TODO: pick crossover mechanism (uniform?)
+        #Uniform cross over method chosen
         for i in range(len(self.population)-1): 
-
+            #Create 2 new temp lists for the chromosomes 
             NewChromoC1 = list()
             NewChromoC2 = list()  
-
+            #Pick the 2 parents that will cross over 
             Parent1 = self.population[i]
             Parent2 = self.population[i+1]
-            
+            #Create 2 new children to be made from the parents 
             Child1 = individual()
             Child2 = individual()
-            
+            #SEt the child size to the parents size 
             Child1.InitChromie(Parent1.getsize())
             Child2.InitChromie(Parent2.getsize())
-            
+            #For each of the values in the chromosome 
             for i in range(Parent1.getsize()):
+                #Randomly generate a value 
                 score = random.random()
+                #If the selected score is higher than the cross over rate 
                 if score > self.crossover_rate: 
+                    #Set a variable to the first parents chromosome at the given index position 
                     bit = Parent1.getChromie()
                     bit = bit[i]
+                    #Set a second variable to the second parents chromsome position value 
                     bit2 = Parent2.getChromie()
                     bit2 = bit2[i]
+                #Other wise 
                 else: 
+                    #Set a variable to the second parents chromosome at the given index position 
                     bit = Parent2.getChromie()
                     bit = bit[i]
+                    #Set a second variable to the first parents chromsome position value 
                     bit2 = Parent1.getChromie()
                     bit2 = bit2[i]
+                #Append these values to the respective childrens chromosome arrays
                 NewChromoC1.append(bit)
                 NewChromoC2.append(bit2)
+            #Ensure that the new chromosomes are numpy arrays 
             NewChromoC1 = np.array(NewChromoC1)
             NewChromoC2 = np.array(NewChromoC2)
+            #Set the children chromosome values 
             Child1.SetChromie(NewChromoC1)
             Child2.SetChromie(NewChromoC2)
+            #Add these children to the new population 
             NewPop.append(Child1)
             NewPop.append(Child2)
+        #Update the population to only be the new population 
         self.population = NewPop
-        
+        #IF we generate too many children randomly kill them until the population is controlled 
         while(len(self.population) > self.pop_size): 
+            #Pick a random int 
             Kill = random.randint(0,len(self.population))
+            #Remove the member from the population 
             self.population.remove(self.population[Kill])
+        #Now mutate
         self.mutate()
 
 
