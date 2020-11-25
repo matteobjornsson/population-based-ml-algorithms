@@ -1,6 +1,10 @@
+# author: matteo bjornsson
+######################################
+# this file is used as a utility to process csv results and average them
+########################################
 import pandas as pd
 
-def average_every_3():
+def average_every_x():
     # data_sets = ["soybean", "glass", "abalone","cancer","fire", "machine"] 
 
     # for data_set in data_sets:
@@ -20,7 +24,8 @@ def average_every_3():
     df['average2'] = l
     df.to_csv(filename, index=False)
 
-average_every_3()
+average_every_x()
+
 # def fix_soybean():
 #     omega = [.2, .5, .8 ]
 #     c1 = [.1, .5, .9, 5]
