@@ -159,6 +159,7 @@ def driver(q, maxIter: int, ds: str, data_package: list, regression: bool, du: D
         # initi PSO and train it
         pso = PSO(layers, hyper_params, nn, maxIter)
         for epoch in range(pso.max_t):
+            print("job", count, "generation", epoch)
             pso.update_fitness()
             pso.update_position_and_velocity()
         
