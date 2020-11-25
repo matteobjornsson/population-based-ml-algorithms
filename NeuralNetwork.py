@@ -8,13 +8,8 @@
 
 from types import new_class
 import numpy as np
-import math
-import DataUtility
 import pandas as pd
 import matplotlib.pyplot as plt
-import time 
-import copy
-import traceback
 
 class NeuralNetwork:
 
@@ -135,22 +130,6 @@ class NeuralNetwork:
         numerator = np.exp(Values)
         denom = np.sum(np.exp(Values), axis=0)
         return numerator/denom
-        # denom[denom < .] = np.nan_to_num(denom)
-        # with np.errstate(invalid='raise'):
-        #     try:
-        #         result = numerator/denom
-        #         return result
-        #     except Exception as e:
-        #         print('Caught exception in worker thread')
-
-        #         # This prints the type, value, and stack trace of the
-        #         # current exception being handled.
-        #         traceback.print_exc()
-        #         print("values: \n", Values)
-        #         print("numerator: \n", numerator)
-        #         print("Denominator: \n", denom)
-        #         raise e
-
 
     ################# Error functions #####################
     #Generates the mean squared error for a given ground turth and estimate 
