@@ -4,7 +4,7 @@ def average_every_3():
     # data_sets = ["soybean", "glass", "abalone","cancer","fire", "machine"] 
 
     # for data_set in data_sets:
-    filename = "/home/matteo/repos/MachineLearning/Project_4/GA_results.csv"
+    filename = "/home/matteo/repos/MachineLearning/Project_4/experimental_results/GA_results.csv"
     df = pd.read_csv(filename)
     l = []
     base = 0
