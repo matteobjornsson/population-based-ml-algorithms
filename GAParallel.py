@@ -1,3 +1,6 @@
+# this is the parallelized version of GA.py. Parallelized by Matteo Bjornsson, original code written by Nick Stone
+################################################################################
+
 import random
 import Performance
 from NeuralNetwork import NeuralNetwork
@@ -45,14 +48,6 @@ class individual:
             print(i)
 
 class GA:
-    # #hyperparameter?
-    # pop_size = 5
-    # population = list() #TODO: what data structure to use here?
-    # genetation = 0
-    # Chromosome_Size = 10 
-    # # hyperparameter!
-    # probability_of_crossover = .5 
-
     #####################
     # Initialize the population etc
     ####################
@@ -126,7 +121,7 @@ class GA:
             
 
     ##################################
-    # pick a subset of POP based on fitness OR some sort of random or ranked selection
+    # pick a subset of POP based ranked selection
     #####################################
     def selection(self):
 
@@ -482,17 +477,15 @@ if __name__ == '__main__':
                 if z != 2: continue
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
+                # these are the parameters that were tuned:
+                ############################################
                 # popss =[100] # paper suggests 10 * total weight
                 # bet = [.5,.8,.2] # note suggested from paper: [.5 , 1]
                 # cr = [.1, .3, .8] # note suggested from paper: cr from [0,.3], [.8, 1] if not converging
                 # maxgen = [500]
 
                 total_trials = 180
-                # "abalone": {
-                    # "mutation_rate": .8,
-                    # "crossover_rate": .8,
-                #     "hidden_layer": [6,8]
-                # }
+
                 hyperparameters = {
                         "maxGen":500,
                         "pop_size":500,
@@ -500,16 +493,6 @@ if __name__ == '__main__':
                         "mutation_range": 10,
                         "crossover_rate": tuned_parameters[z]["crossover_rate"]                                         
                     }
-                # for a in popss: 
-                #     for b in bet:
-                #         for c in cr: 
-                #             for d in maxgen: 
-                #                 hyperparameters = {
-                #                     "population_size": a,
-                #                     "beta": b,
-                #                     "crossover_rate": c, 
-                #                     "max_gen": d                                          
-                #                     }
 
 
                 pool.apply_async(driver, args=(
