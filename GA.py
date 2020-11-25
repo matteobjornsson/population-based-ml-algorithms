@@ -13,15 +13,16 @@ import numpy as np
 import copy
 import matplotlib.pyplot as plt
 
+#Individual that is designed to represent a given member in the population 
 class individual:
-    
+    #On init set the meta data to some known values 
     def __init__(self):
         self.fitness = float('inf')
         #How big should each chromosome be? My initial assumption is the number of feature vectors across the board 
         self.chromosome = [] # some numpy == weights
         self.Size = 0 
 
-
+    #Use a separate init function when given some meta data 
     def InitChromie(self,Feature_Size):
         #Loop through each index up until the number of features and just set it to 0 
         self.chromosome = [Feature_Size]
@@ -29,23 +30,29 @@ class individual:
             self.chromosome[i] = 0  
         self.chromosome = np.array(self.chromosome)
         self.Size = Feature_Size
-
+    ###################################### Mutators and Accessors ##########################
+    #SEt the fitness of a member in the population 
     def setfit(self,fit): 
         self.fitness = fit 
+    #Get the members fitness 
     def getfit(self): 
         return self.fitness 
+    #Set the members chromosome 
     def SetChromie(self,Chromos): 
         self.chromosome = Chromos
+    #Set the members size 
     def SetSize(self,si): 
         self.Size = si 
+    #Get the chromosome size 
     def getsize(self): 
         return self.Size
+    #Get the chromosome from a member in the population 
     def getChromie(self): 
         return self.chromosome 
-
+    #Return the given member in the populations chromosome 
     def ReturnChromie(self):
         return self.chromosome
-
+    #Print the contents of the chromosome 
     def printChromie(self): 
         for i in self.chromosome: 
             print(i)
@@ -113,6 +120,7 @@ class GA:
     
         ########################################
     # Evaluate the fitness of an individual
+     # USED IN VIDEO TO PRINT EACH STEP DO NOT USE IN PROD 
     ########################################
     def pfitness(self,) -> float:
         print("FITNESS")
@@ -152,6 +160,7 @@ class GA:
 
         ##################################
     # pick a subset of POP based on fitness OR some sort of random or ranked selection
+     # USED IN VIDEO TO PRINT EACH STEP DO NOT USE IN PROD 
     #####################################
     def Pselection(self):
         print("SELECTION")
@@ -236,7 +245,9 @@ class GA:
 
 
         ####################################
-    # make new generation based on parent selection by swapping chromosomes 
+    # make new generation based on parent selection by swapping chromosomes
+
+     # USED IN VIDEO TO PRINT EACH STEP DO NOT USE IN PROD  
     ####################################
     def Pcrossover(self): 
         print("CROSS OVER ")
@@ -304,6 +315,8 @@ class GA:
                 i.SetChromie(temp)  
         ###################################
     # introduce random change to each individual in the generation
+
+     # USED IN VIDEO TO PRINT EACH STEP DO NOT USE IN PROD 
     ###############################
     def Pmutate(self):
         print("MUTATION")
