@@ -1,5 +1,5 @@
 #################################
-# Scratch file for plotting data
+# utility file for plotting data
 #################################
 
 import matplotlib.pyplot as plt
