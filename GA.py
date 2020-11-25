@@ -1,3 +1,10 @@
+
+# Author: Nick Stone, some by Matteo Bjornsson
+################################################################################
+# This is the driver for running the GA experiment. This file 
+# grabs data sets from "./NormalizedData" and for each data set generates 
+# tenfolds, and runs GA to train each of the 0,1,2 layer neural networks. 
+################################################################################
 import random
 import Performance
 from NeuralNetwork import NeuralNetwork
@@ -44,13 +51,6 @@ class individual:
             print(i)
 
 class GA:
-    # #hyperparameter?
-    # pop_size = 5
-    # population = list() #TODO: what data structure to use here?
-    # genetation = 0
-    # Chromosome_Size = 10 
-    # # hyperparameter!
-    # probability_of_crossover = .5 
 
     #####################
     # Initialize the population etc
@@ -71,7 +71,6 @@ class GA:
         self.globalfit = list() 
         
         #init general population 
-        #On the creation of a genetic algorithm, we should create a series of random weights in a numpy array that can be fed into the neural network. 
         #Create an individual object and set the chromosome weight randomly for each of the individuals in the population (pop size)
         self.population = list()
         for i in range(self.pop_size): 
@@ -518,16 +517,6 @@ if __name__ == '__main__':
                         for c in mr:
                             for d in mra:
                                 for e in crosss:
-                                        """
-                                              hyperparameters = {
-                                                "maxGen":100,
-                                                "pop_size":100,
-                                                "mutation_rate": .5,
-                                                "mutation_range": 10,
-                                                "crossover_rate": .5
-                                                }
-
-                                        """
                                         hyperparameters = {
                                               "maxGen":a,
                                               "pop_size":b,

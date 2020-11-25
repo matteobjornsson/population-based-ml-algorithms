@@ -1,3 +1,9 @@
+# Author: Nick Stone
+################################################################################
+# This is the driver for running the DE experiment. This file 
+# grabs data sets from "./NormalizedData" and for each data set generates 
+# tenfolds, and runs DE to train each of the 0,1,2 layer neural networks. 
+################################################################################
 import random
 import Performance
 from NeuralNetwork import NeuralNetwork
@@ -109,7 +115,7 @@ class DE:
             self.population[i] = organism
         self.globalbest.append(bestfit)
 
-            ###################################
+    ###################################
     # grab 3 vectors from pop, without repalcement, generate trial vector
     ###############################
     def Pmutate_and_crossover(self):

@@ -1,3 +1,9 @@
+# Author: Matteo Bjornsson
+################################################################################
+# This is the driver for running the PSO experiment. This file 
+# grabs data sets from "./NormalizedData" and for each data set generates 
+# tenfolds, and runs PSO to train each of the 0,1,2 layer neural networks. 
+################################################################################
 import random
 import Performance
 from NeuralNetwork import NeuralNetwork
@@ -218,6 +224,9 @@ class PSO:
         # track global best over time each iteration
         self.fitness_plot.append(self.gbest_fitness)
 
+################################
+#           MAIN
+###############################
 if __name__ == '__main__':
 
     headers = ["Data set", "layers", "omega", "c1", "c2", "vmax", "pop_size", "loss1", "loss2"]
@@ -364,14 +373,12 @@ if __name__ == '__main__':
     du = DataUtility.DataUtility(categorical_attribute_indices, regression_data_set)
     total_counter = 0
     for data_set in data_sets:
-        if data_set != 'glass': continue
         data_set_counter = 0
         # ten fold data and labels is a list of [data, labels] pairs, where 
         # data and labels are numpy arrays:
         tenfold_data_and_labels = du.Dataset_and_Labels(data_set)
 
         for j in range(10):
-            # if j != 1: continue
             test_data, test_labels = copy.deepcopy(tenfold_data_and_labels[j])
             #Append all data folds to the training data set
             remaining_data = [x[0] for i, x in enumerate(tenfold_data_and_labels) if i!=j]
@@ -402,7 +409,6 @@ if __name__ == '__main__':
             tuned_parameters = [tuned_0_hl[data_set], tuned_1_hl[data_set], tuned_2_hl[data_set]]
             
             for z in range(3):
-                if z != 2: continue
                 hidden_layers = tuned_parameters[z]["hidden_layer"]
 
                 hyperparameters = {
@@ -444,20 +450,20 @@ if __name__ == '__main__':
                 bestSolution = pso.gbest_position
                 bestWeights = pso.NN.weight_transform(bestSolution)
                 pso.NN.weights = bestWeights
-                ################################# new code for PSO end ###################################
+                ################plotting code: ###########################
                 # plt.ioff()
                 # plt.plot(list(range(len(pso.fitness_plot))), pso.fitness_plot)
                 # for p in range(len(pso.particle_plots)):
                 #     plt.plot(list(range(len(pso.particle_plots[p]))), pso.particle_plots[p])
                 # plt.show()
+                ########################################################
 
                 Estimation_Values = pso.NN.classify(test_data,test_labels)
                 if regression == False: 
                     #Decode the One Hot encoding Value 
                     Estimation_Values = pso.NN.PickLargest(Estimation_Values)
                     test_labels_list = pso.NN.PickLargest(test_labels)
-                    # print("ESTiMATION VALUES BY GIVEN INDEX (CLASS GUESS) ")
-                    # print(Estimation_Values)
+
                 else: 
                     Estimation_Values = Estimation_Values.tolist()
                     test_labels_list = test_labels.tolist()[0]
