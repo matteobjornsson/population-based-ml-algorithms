@@ -13,23 +13,32 @@ import copy
 import matplotlib.pyplot as plt
 
 
-
+#A class that is designed to hold a given chromosome and a fitness score and other meta data to be used 
 class individual(): 
- 
+    
+    #On initialization set some of the meta data to valeus that we know we can easily over write
     def __init__(self, Size):
+            #Set all of the meta data 
             self.fitness = float('inf')
             self.Chromie = list() 
             lowerbound = -10 
             upperbound = 10 
+            #Randomly create a chromosome 
             for i in range(Size):
                 self.Chromie.append(random.uniform(lowerbound,upperbound))
+            #Ensure that the chromosome is a numpy array 
             self.Chromie = np.array(self.Chromie)
+    ###################################### Mutators and Accessors ##########################
+    #Return the individuals chromosome 
     def getchromie(self): 
         return self.Chromie
+    #SEt the individuals chromosome 
     def setchromie(self,chrom):
         self.Chromie = chrom 
+    #Get the individuals fitness
     def getfit(self): 
         return self.fitness
+    #Set the individuals fitness 
     def setfit(self,fitt): 
         self.fitness = fitt
 
@@ -46,12 +55,17 @@ class DE:
         self.pop_size = hyperparameters["population_size"]
         self.probability_of_crossover = hyperparameters["crossover_rate"]
         #Hyperparameters ^
-
-        self.population = list() #TODO: what data structure to use here?
+        #Create a list to hold all of the individuals 
+        self.population = list() 
+        #Create the number of individuals equal to the population 
         for i in range(self.pop_size): 
+            #Save the individual created
             temp = individual(Chromie_Size)
+            #Add it to the population
             self.population.append(temp)
+        #Generation starts at 0 
         self.generation = 0
+        #Set the following meta data to the corresponding inputs 
         self.nn = nn 
         self.globalbest = list() 
         self.bestChromie = self.population[0]
@@ -72,51 +86,74 @@ class DE:
     # grab 3 vectors from pop, without repalcement, generate trial vector
     ###############################
     def mutate_and_crossover(self):
+        #Set the best fitness to a large value 
         bestfit = float('inf')
+        #For every member in the population 
         for i in range(len(self.population)):
+            #Create a new list 
             nums = list()
+            #Append the individuals position in the list 
             nums.append(i)
             count = 0 
+            #Randomly grab 3 other members of the population and continue to do this such that they are unique
             while(count < 4): 
                 org = random.randint(0,len(self.population)-1)
                 if org in nums: 
                     continue 
+                #Add the member to the list 
                 nums.append(org)
+                #Incremebt count 
                 count = count +1
+            #set a variable to be the given individual in the population 
             organism = self.population[i]
+            #Remove the index from the list 
             nums.remove(i)
+            #Assign 3 other randomly generated members of the population 
             organ1 = self.population[nums[0]]
             organ2 = self.population[nums[1]]
             organ3 = self.population[nums[2]]
+            #make a deep copy of the chromosome 
             temp = copy.deepcopy(organism.getchromie())
-            for j in range(len(organism.getchromie())): 
+            #For each position in the chromosome 
+            for j in range(len(organism.getchromie())):
+                #Extract the same position from the other chromosomees 
                 x1 = organ1.getchromie()[j]
                 x2 = organ2.getchromie()[j]
                 x3 = organ3.getchromie()[j]
-
+                #Set a variable to the beta in the init function 
                 b = self.beta
+                #Generate a new fitness column 
                 ColumnTV =  x1 + b * (x2 - x3)      
                 coin = random.random() 
+                #If the probablility is less than the cross over 
                 if coin < self.probability_of_crossover: 
+                    #Set the new generated chromosome 
                     temp[j] = ColumnTV
                 else: 
                     #No crossover 
                     continue 
+            #Set the fitness 
             fitness = self.fitness(temp)
             # self.particle_plots[i].append(fitness)
+            #If the fitness is better 
             if fitness < organism.getfit(): 
                 organism.setfit(fitness)
                 organism.setchromie(temp)
+            #If the fitness is better than best fit 
             if fitness < bestfit: 
                 bestfit = fitness
+            #If the fitness is better than the best chromosomes fitness 
             if fitness < self.bestChromie.fitness:
                 self.bestChromie = organism
-            
+            #Set the member of the population to the altered organism 
             self.population[i] = organism
+        #Add the best fitness to the global best 
         self.globalbest.append(bestfit)
 
     ###################################
     # grab 3 vectors from pop, without repalcement, generate trial vector
+
+    # USED IN VIDEO TO PRINT EACH STEP DO NOT USE IN PROD 
     ###############################
     def Pmutate_and_crossover(self):
         bestfit = float('inf')
